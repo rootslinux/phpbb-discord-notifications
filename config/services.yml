@@ -1,0 +1,14 @@
+imports:
+    - { resource: parameters.yml }
+
+services:
+    roots.discordnotifications.service:
+        class: roots\discordnotifications\service
+        arguments:
+            - '@user'
+            - '%roots.discordnotifications.tables.demo_table%'
+
+    roots.discordnotifications.listener:
+        class: roots\discordnotifications\event\main_listener
+        tags:
+            - { name: event.listener }
