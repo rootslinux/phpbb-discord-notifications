@@ -1,11 +1,9 @@
 <?php
 /**
- *
- * Discord Notifications. An extension for the phpBB Forum Software package.
+ * Discord Notifications extension for the phpBB Forum Software package.
  *
  * @copyright (c) 2018, Tyler Olsen, https://github.com/rootslinux
  * @license GNU General Public License, version 2 (GPL-2.0)
- *
  */
 
 namespace roots\discordnotifications\acp;
@@ -19,12 +17,12 @@ class main_info
 	{
 		return array(
 			'filename'	=> '\roots\discordnotifications\acp\main_module',
-			'title'		=> 'ACP_DEMO_TITLE',
+			'title'		=> 'ACP_DISCORD_NOTIFICATIONS',
 			'modes'		=> array(
 				'settings'	=> array(
-					'title'	=> 'ACP_DEMO',
+					'title'	=> 'Discord Notifications',
 					'auth'	=> 'ext_roots/discordnotifications && acl_a_board',
-					'cat'	=> array('ACP_DEMO_TITLE')
+					'cat'	=> array('ACP_DISCORD_NOTIFICATIONS')
 				),
 			),
 		);

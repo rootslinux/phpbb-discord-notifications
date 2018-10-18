@@ -18,7 +18,7 @@ Windows:
 
     phpBB\vendor\bin\phpunit.bat -c phpBB\ext\roots\discordnotifications\phpunit.xml.dist
 
-others:
+Other Systems:
 
     phpBB/vendor/bin/phpunit -c phpBB/ext/roots/discordnotifications/phpunit.xml.dist
 
