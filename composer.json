@@ -1,7 +1,7 @@
 {
     "name": "roots/discordnotifications",
     "type": "phpbb-extension",
-    "description": "Publishes forum events as notifications to a specifed Discord channel",
+    "description": "Publishes forum event notifications to a Discord server channel",
     "homepage": "https://github.com/rootslinux/phpbb-discord-notifications",
     "version": "1.0.0-dev",
     "time": "2018-10-14",
