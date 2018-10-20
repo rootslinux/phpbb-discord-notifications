@@ -2,13 +2,16 @@ imports:
     - { resource: parameters.yml }
 
 services:
-    roots.discordnotifications.service:
-        class: roots\discordnotifications\service
+    roots.discordnotifications.notification_service:
+        class: roots\discordnotifications\notification_service
         arguments:
+            - '@config'
+            - '@config_text'
             - '@user'
-            - '%roots.discordnotifications.tables.demo_table%'
 
     roots.discordnotifications.listener:
-        class: roots\discordnotifications\event\main_listener
+        class: roots\discordnotifications\event\notification_event_listener
+        arguments:
+            - '@roots.discordnotifications.notification_service'
         tags:
             - { name: event.listener }
