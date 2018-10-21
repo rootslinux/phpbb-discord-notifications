@@ -2,20 +2,92 @@
 
 <h1>{L_ACP_DISCORD_NOTIFICATIONS}</h1>
 
+<p>{DN_ACP_DESCRIPTION}</p>
+
 <form id="acp_board" method="post" action="{U_ACTION}">
 
 	<fieldset>
-		<legend>{L_SETTINGS}</legend>
+		<legend>{L_DN_MAIN_SETTINGS}</legend>
 		<dl>
-			<dt><label for="master_enable_extension">{L_ACP_ENABLE_EXTENSION}{L_COLON}</label></dt>
-			<dd><label><input type="radio" class="radio" name="master_enable_extension" value="1" <!-- IF ACP_ENABLE_EXTENSION -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
-				<label><input type="radio" class="radio" name="master_enable_extension" value="0" <!-- IF not ACP_ENABLE_EXTENSION -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+			<dt><label for="master_enable_extension">{L_DN_MASTER_ENABLE}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="master_enable_extension" value="1" <!-- IF DN_MASTER_ENABLE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="master_enable_extension" value="0" <!-- IF not DN_MASTER_ENABLE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
+		<dl>
+			<dt><label for="dn_webhook_url">{L_DN_WEBHOOK_URL}{L_COLON}</label><br /><span>{L_DN_WEBHOOK_DESCRIPTION}</span></dt>
+			<dd>
+				<input name="dn_webhook_url" type="text" value="{{ DN_WEBHOOK_URL }}" size="100" maxlength="255" />
+			</dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
+		<legend>{L_DN_TYPE_SETTINGS}</legend>
+		<p>{L_DN_TYPE_DESCRIPTION}</p>
+		<dl>
+			<dt><label for="dn_post_create">{L_DN_POST_CREATE}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_post_create" value="1" <!-- IF DN_POST_CREATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_post_create" value="0" <!-- IF not DN_POST_CREATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_post_update">{L_DN_POST_UPDATE}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_post_update" value="1" <!-- IF DN_POST_UPDATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_post_update" value="0" <!-- IF not DN_POST_UPDATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_post_delete">{L_DN_POST_DELETE}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_post_delete" value="1" <!-- IF DN_POST_DELETE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_post_delete" value="0" <!-- IF not DN_POST_DELETE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_post_lock">{L_DN_POST_LOCK}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_post_lock" value="1" <!-- IF DN_POST_LOCK -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_post_lock" value="0" <!-- IF not DN_POST_LOCK -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_post_unlock">{L_DN_POST_UNLOCK}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_post_unlock" value="1" <!-- IF DN_POST_UNLOCK -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_post_unlock" value="0" <!-- IF not DN_POST_UNLOCK -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_topic_create">{L_DN_TOPIC_CREATE}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_topic_create" value="1" <!-- IF DN_TOPIC_CREATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_topic_create" value="0" <!-- IF not DN_TOPIC_CREATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_topic_update">{L_DN_TOPIC_UPDATE}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_topic_update" value="1" <!-- IF DN_TOPIC_UPDATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_topic_update" value="0" <!-- IF not DN_TOPIC_UPDATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_topic_delete">{L_DN_TOPIC_DELETE}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_topic_delete" value="1" <!-- IF DN_TOPIC_DELETE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_topic_delete" value="0" <!-- IF not DN_TOPIC_DELETE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_topic_lock">{L_DN_TOPIC_LOCK}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_topic_lock" value="1" <!-- IF DN_TOPIC_LOCK -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_topic_lock" value="0" <!-- IF not DN_TOPIC_LOCK -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_topic_unlock">{L_DN_TOPIC_UNLOCK}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_topic_unlock" value="1" <!-- IF DN_TOPIC_UNLOCK -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_topic_unlock" value="0" <!-- IF not DN_TOPIC_UNLOCK -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_user_create">{L_DN_USER_CREATE}{L_COLON}</label></dt>
+			<dd><label><input type="radio" class="radio" name="dn_user_create" value="1" <!-- IF DN_USER_CREATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
+				<label><input type="radio" class="radio" name="dn_user_create" value="0" <!-- IF not DN_USER_CREATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
+		<legend>{L_DN_FORUM_SETTINGS}</legend>
+		<p>{L_DN_FORUM_DESCRIPTION}</p>
 	</fieldset>
 
 	<fieldset class="submit-buttons">
 		<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
-		<input class="button2" type="submit" name="preview" value="{L_PREVIEW}" />
 		{S_FORM_TOKEN}
 	</fieldset>
 
