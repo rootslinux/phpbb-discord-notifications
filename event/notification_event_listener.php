@@ -25,10 +25,6 @@ class notification_event_listener implements EventSubscriberInterface
 	/**
 	 * Constructor
 	 * @param \roots\discordnotifications\notification_service $notification_service
-	 * @param \phpbb\controller\helper $controller_helper Controller helper object
-	 * @param \phpbb\language\language $lang              Language object
-	 * @param \phpbb\template\template $template          Template object
-	 * @param string                   $php_ext           phpEx
 	 * @access public
 	 */
 	public function __construct(\roots\discordnotifications\notification_service $notification_service)
@@ -68,6 +64,9 @@ class notification_event_listener implements EventSubscriberInterface
 
 			// Event that returns user id, user details and user CPF of newly registered user
 			'core.user_add_after' => 'notify_user_created',
+
+			// Event after a user is deleted
+			'core.delete_user_after' => 'notify_user_deleted',
 		);
 	}
 
@@ -78,12 +77,11 @@ class notification_event_listener implements EventSubscriberInterface
 	public function notify_post_created($event)
 	{
 		// Check config settings first to see if we need to send a notification for this event
-		// TODO
-// 		echo 'notify_post_created';
-// 		echo '<pre>';
-// 		echo var_dump($event);
-// 		echo '</pre>';
-		$this->notification_service->send_discord_notification('notify_post_created');
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_post_create') == false) {
+			return;
+		}
+
+		$this->notification_service->send_discord_notification('notify_post_created', 'create');
 	}
 
 		/**
@@ -93,12 +91,11 @@ class notification_event_listener implements EventSubscriberInterface
 	public function notify_post_updated($event)
 	{
 		// Check config settings first to see if we need to send a notification for this event
-		// TODO
-// 		echo 'notify_post_updated';
-// 		echo '<pre>';
-// 		var_dump($event);
-// 		echo '</pre>';
-		$this->notification_service->send_discord_notification('notify_post_updated');
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_post_update') == false) {
+			return;
+		}
+
+		$this->notification_service->send_discord_notification('notify_post_updated', 'update');
 	}
 
 	/**
@@ -108,12 +105,11 @@ class notification_event_listener implements EventSubscriberInterface
 	public function notify_post_deleted($event)
 	{
 		// Check config settings first to see if we need to send a notification for this event
-		// TODO
-// 		echo 'notify_post_deleted';
-// 		echo '<pre>';
-// 		var_dump($event);
-// 		echo '</pre>';
-		$this->notification_service->send_discord_notification('notify_post_deleted');
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_post_delete') == false) {
+			return;
+		}
+
+		$this->notification_service->send_discord_notification('notify_post_deleted', 'delete');
 	}
 
 	/**
@@ -122,13 +118,14 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	public function notify_post_lock_status($event)
 	{
+		// TODO: Determine if the post is being locked or unlocked
+
 		// Check config settings first to see if we need to send a notification for this event
-		// TODO
-// 		echo 'notify_post_locked';
-// 		echo '<pre>';
-// 		var_dump($event);
-// 		echo '</pre>';
-		$this->notification_service->send_discord_notification('notify_post_lock_status');
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_post_lock') == false) {
+			return;
+		}
+
+		$this->notification_service->send_discord_notification('notify_post_lock_status', 'lock');
 	}
 
 	/**
@@ -138,9 +135,11 @@ class notification_event_listener implements EventSubscriberInterface
 	public function notify_topic_created($event)
 	{
 		// Check config settings first to see if we need to send a notification for this event
-		// TODO
-// 		var_dump($event);
-		$this->notification_service->send_discord_notification('notify_topic_created');
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_topic_create') == false) {
+			return;
+		}
+
+		$this->notification_service->send_discord_notification('notify_topic_created', 'create');
 	}
 
 	/**
@@ -150,12 +149,11 @@ class notification_event_listener implements EventSubscriberInterface
 	public function notify_topic_updated($event)
 	{
 		// Check config settings first to see if we need to send a notification for this event
-		// TODO
-// 		echo 'notify_topic_updated';
-// 		echo '<pre>';
-// 		var_dump($event);
-// 		echo '</pre>';
-		$this->notification_service->send_discord_notification('notify_topic_updated');
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_topic_update') == false) {
+			return;
+		}
+
+		$this->notification_service->send_discord_notification('notify_topic_updated', 'update');
 	}
 
 	/**
@@ -165,12 +163,11 @@ class notification_event_listener implements EventSubscriberInterface
 	public function notify_topic_deleted($event)
 	{
 		// Check config settings first to see if we need to send a notification for this event
-		// TODO
-// 		echo 'notify_topic_deleted';
-// 		echo '<pre>';
-// 		var_dump($event);
-// 		echo '</pre>';
-		$this->notification_service->send_discord_notification('notify_topic_deleted');
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_topic_delete') == false) {
+			return;
+		}
+
+		$this->notification_service->send_discord_notification('notify_topic_deleted', 'delete');
 	}
 
 	/**
@@ -179,28 +176,45 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	public function notify_topic_lock_status($event)
 	{
+		// TODO: Determine if the topic is being locked or unlocked
+
 		// Check config settings first to see if we need to send a notification for this event
-		// TODO
-// 		var_dump($event);
-		$this->notification_service->send_discord_notification('notify_topic_lock_status');
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_topic_lock') == false) {
+			return;
+		}
+
+		$this->notification_service->send_discord_notification('notify_topic_lock_status', 'lock');
 	}
 
 	/**
 	 * Sends a notification to Discord when a new user account is created.
-	 * @param \phpbb\event\data	$event	Event object -- Arguments(cp_data, user_id, user_row)
+	 * @param \phpbb\event\data	$event	Event object -- arguments(cp_data, user_id, user_row)
 	 *
 	 * Notification details include the user name and a link to the user's profile page
 	 */
 	public function notify_user_created($event)
 	{
 		// Check config settings first to see if we need to send a notification for this event
-		// TODO
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_user_create') == false) {
+			return;
+		}
 
 		$user_id = $event['user_id'];
-// 		echo 'notify_user_created';
-// 		echo '<pre>';
-// 		var_dump($event);
-// 		echo '</pre>';
-		$this->notification_service->send_discord_notification('notify_user_created');
+
+		$this->notification_service->send_discord_notification('notify_user_created', 'user');
+	}
+
+	/**
+	 * Sends a notification to Discord when a user account is deleted.
+	 * @param \phpbb\event\data	$event	Event object -- arguments(mode, retain_username, user_ids, user_rows )
+	 */
+	public function notify_user_deleted($event)
+	{
+		// Check config settings first to see if we need to send a notification for this event
+		if ($this->notification_service->is_notification_type_enabled('discord_notification_type_user_create') == false) {
+			return;
+		}
+
+		$this->notification_service->send_discord_notification('notify_user_deleted', 'delete');
 	}
 }
