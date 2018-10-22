@@ -22,5 +22,5 @@ $lang = array_merge($lang, array(
 	'ACP_DISCORD_NOTIFICATIONS_TITLE'			=> 'Discord Notification Settings',
 
 	// ACP Logs
-	'ACP_DISCORD_NOTIFICATIONS_LOG_UPDATE'		=> '<strong>Modified Discord notification settings </strong>',
+	'ACP_DISCORD_NOTIFICATIONS_LOG_UPDATE'		=> '<strong>Modified Discord notification settings</strong>',
 ));

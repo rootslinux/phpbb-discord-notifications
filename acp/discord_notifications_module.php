@@ -25,6 +25,9 @@ class discord_notifications_module
 	/** @var string */
 	public $u_action;
 
+	/** @var \phpbb\cache\driver\driver_interface */
+	protected $cache;
+
 	/** @var \phpbb\config\config */
 	protected $config;
 
@@ -40,10 +43,10 @@ class discord_notifications_module
 	/** @var \phpbb\user */
 	protected $user;
 
-
 	public function main($id, $mode)
 	{
 		global $phpbb_container;
+		$this->cache = $phpbb_container->get('cache.driver');
 		$this->config = $phpbb_container->get('config');
 		$this->log = $phpbb_container->get('log');
 		$this->request = $phpbb_container->get('request');
@@ -53,42 +56,46 @@ class discord_notifications_module
 		$this->user->add_lang_ext('roots/discordnotifications', 'acp_discord_notifications');
 		$this->tpl_name = 'acp_discord_notifications';
 		$this->page_title = $this->user->lang('ACP_DISCORD_NOTIFICATIONS_TITLE');
-		add_form_key('roots_discord_notifications');
+
+		$form_name = 'roots_discord_notifications';
+		add_form_key($form_name);
 
 		// Process setting changes
 		if ($this->request->is_set_post('submit'))
 		{
-			if (!check_form_key('roots_discord_notifications'))
+			if (!check_form_key($form_name))
 			{
 				trigger_error('FORM_INVALID', E_USER_WARNING);
 			}
+
+			// Get form values for the main settings
 			$master_enable = $this->request->variable('dn_master_enable', 0);
 			$webhook_url = $this->request->variable('dn_webhook_url', '');
-			$max_length = $this->request->variable('dn_post_preview_length', 0);
+			$preview_length = $this->request->variable('dn_post_preview_length', '');
 
 			// If the master enable is set to on, a webhook URL is required
-			if ($master_enable && $webhook_url = '')
+			if ($master_enable == 1 && $webhook_url == '')
 			{
-				trigger_error('DN_MASTER_WEBHOOK_REQUIRED', E_USER_WARNING);
+				trigger_error($this->user->lang('DN_MASTER_WEBHOOK_REQUIRED') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 			// Check that the webhook URL is a valid URL string if it is not empty
 			if ($webhook_url != '' && !filter_var($webhook_url, FILTER_VALIDATE_URL))
 			{
-				trigger_error('DN_WEBHOOK_URL_INVALID', E_USER_WARNING);
+				trigger_error($this->user->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 			// Verify that the post preview length is a numeric value and within the valid range
-			if (!is_numeric($max_length))
+			if (is_numeric($preview_length) == false)
 			{
-				trigger_error('DN_POST_PREVIEW_INVALID', E_USER_WARNING);
+				trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
-			elseif ($max_length < 0 || $max_length > MAX_POST_PREVIEW_LENGTH)
+			elseif ($preview_length < 0 || $preview_length > self::MAX_POST_PREVIEW_LENGTH)
 			{
-				trigger_error('DN_POST_PREVIEW_BAD_VALUE', E_USER_WARNING);
+				trigger_error($this->user->lang('DN_POST_PREVIEW_BAD_VALUE') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
 			$this->config->set('discord_notifications_enabled', $master_enable);
 			$this->config->set('discord_notifications_webhook_url', $webhook_url);
-			$this->config->set('discord_notifications_post_preview_length', $max_length);
+			$this->config->set('discord_notifications_post_preview_length', $preview_length);
 
 			$this->config->set('discord_notification_type_post_create', $this->request->variable('dn_post_create', 0));
 			$this->config->set('discord_notification_type_post_update', $this->request->variable('dn_post_update', 0));
@@ -105,15 +112,19 @@ class discord_notifications_module
 			$this->config->set('discord_notification_type_user_create', $this->request->variable('dn_user_create', 0));
 			$this->config->set('discord_notification_type_user_delete', $this->request->variable('dn_user_delete', 0));
 
-			// TODO: Add entry in ACP log that user changed DN settings
+			// Log the settings change
+			$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'ACP_DISCORD_NOTIFICATIONS_LOG_UPDATE');
+			// Destroy any cached discord notification data
+			$this->cache->destroy('roots_discord_notifications');
 
 			trigger_error($this->user->lang('DN_SETTINGS_SAVED') . adm_back_link($this->u_action));
 		}
 
 		$this->template->assign_vars(array(
 			'DN_MASTER_ENABLE'			=> $this->config['discord_notifications_enabled'],
-			'DN_WEBHOOK_URL'			=> $this->config['discord_notification_webhook_url'],
-			'DN_POST_PREVIEW_LENGTH'	=> $this->config['discord_notification_post_preview_length'],
+			'DN_WEBHOOK_URL'			=> $this->config['discord_notifications_webhook_url'],
+			'DN_POST_PREVIEW_LENGTH'	=> $this->config['discord_notifications_post_preview_length'],
+			'DN_TEST_MESSAGE_TEXT'		=> $this->user->lang('DN_TEST_MESSAGE_TEXT'),
 
 			'DN_POST_CREATE'			=> $this->config['discord_notification_type_post_create'],
 			'DN_POST_UPDATE'			=> $this->config['discord_notification_type_post_update'],
