@@ -20,7 +20,7 @@ class discord_notifications_info
 			'title'		=> 'ACP_DISCORD_NOTIFICATIONS',
 			'modes'		=> array(
 				'settings'	=> array(
-					'title'	=> 'Discord Notifications',
+					'title'	=> 'ACP_DISCORD_NOTIFICATIONS_TITLE',
 					'auth'	=> 'ext_roots/discordnotifications && acl_a_board',
 					'cat'	=> array('ACP_DISCORD_NOTIFICATIONS')
 				),

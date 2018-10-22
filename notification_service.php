@@ -16,25 +16,32 @@ namespace roots\discordnotifications;
  */
 class notification_service
 {
+	// Maximum number of characters allowed by Discord in a message description.
+	// Reference: https://discordapp.com/developers/docs/resources/channel#embed-limits
+	const MAX_MESSAGE_SIZE = 2048;
+
+	// These numbers are decimal representations of hexadecimal color codes. Notifications can
+	// only select from the colors listed here.
+	private static $NOTIFICATION_TYPE_COLORS = array(
+		'default'	=> 11777212, // gray
+		'create'	=> 2993970,  // light green
+		'update'	=> 3580392,  // light blue
+		'delete'	=> 15217973, // light red
+		'lock'		=> 14050617, // orange
+		'user'		=> 14038504, // purple
+	);
+
 	/** @var \phpbb\config\config */
 	protected $config;
-
-	/** @var \phpbb\config\db_text */
-	protected $config_text;
-
-	/** @var \phpbb\user */
-	protected $user;
 
 	/**
 	 * Constructor
 	 *
 	 * @param \phpbb\config\config $config
 	 */
-	public function __construct(\phpbb\config\config $config, \phpbb\config\db_text $config_text, \phpbb\user $user)
+	public function __construct(\phpbb\config\config $config)
 	{
 		$this->config = $config;
-		$this->config_text = $config_text;
-		$this->user = $user;
 	}
 
 	/**
@@ -45,8 +52,12 @@ class notification_service
 	public function is_notification_type_enabled($notification_type)
 	{
 		// First check the global extension enabled setting. We don't generate any notifications if this is disabled
+		if ($this->config->get('discord_notifications_enabled') && $this->config->get($notification_type))
+		{
+			return true;
+		}
 
-		return true;
+		return false;
 	}
 
 	/**
@@ -62,7 +73,7 @@ class notification_service
 			return false;
 		}
 
-		// Check the forum table to see if discord notifications are enabled on it
+		// TODO: Check the forum table to see if discord notifications are enabled on it
 		return true;
 	}
 
@@ -101,40 +112,33 @@ class notification_service
 	 * no further checks. The caller is responsible for performing full validation of the notification prior to calling this function.
 	 * @param message The message text to send. If empty, no message will be sent.
 	 */
-	public function send_discord_notification($message)
+	public function send_discord_notification($message, $color)
 	{
-		if ($message == '')
-		{
-			return;
-		}
-		if ($this->config['discord_notifications_enabled'] == 0)
+		if ($this->config['discord_notifications_enabled'] == 0 || $message == '')
 		{
 			return;
 		}
 
-		$discord_webhook_url = $this->config_text['discord_webhook_url'];
+		// Note that the value stored in the config table will always be a valid URL when discord_notifications_enabled is set
+		$discord_webhook_url = $this->config['discord_notifications_webhook_url'];
 
-		$this->send_message($message, $discord_webhook_url);
+		$this->send_message($discord_webhook_url, $message, $color);
 	}
 
 	/**
 	 * Sends a notification message to Discord, disregarding any configurations that are currently set. This method is primarily for user testing
 	 * purposes from the ACP
 	 * @param message The message text to send. If empty, no message will be sent.
-	 * @param discord_webhook_url The URL of the Discord webhook to transmit the message to. If empty, no message will be sent.
+	 * @param discord_webhook_url The URL of the Discord webhook to transmit the message to. If this is an invalid URL, no message will be sent.
 	 */
 	public function force_send_discord_notification($message, $discord_webhook_url)
 	{
-		if ($message == '')
-		{
-			return;
-		}
-		if ($discord_webhook_url == '')
+		if (!filter_var($discord_webhook_url, FILTER_VALIDATE_URL) || $message == '')
 		{
 			return;
 		}
 
-		$this->send_message($message, $discord_webhook_url);
+		$this->send_message($discord_webhook_url, $message, 'default');
 	}
 
 	/**
@@ -143,14 +147,22 @@ class notification_service
 	 * @param discord_webhook_url The URL of the Discord webhook to transmit the message to.
 	 * @return
 	 */
-	private function send_message($message, $discord_webhook_url)
+	private function send_message($discord_webhook_url, $message, $color)
 	{
 		// First analyze the message and replace characters that would cause issues with the JSON formatting
 		// Convert " to ' in the message to be sent as otherwise JSON formatting would break.
 		$message = str_replace('"', "'", $message);
 
-		// TEMP
-		$color = 2993970;
+		// TODO: Verify that the message size is within the allowable limit and truncate if necessary
+
+		// Fetch the requested color value. If not found, use the default color
+		if (in_array($color, $NOTIFICATION_TYPE_COLORS) == true) {
+			$color = $NOTIFICATION_TYPE_COLORS[$color];
+		}
+		else {
+			$color = $NOTIFICATION_TYPE_COLORS['default'];
+		}
+
 
 		// Place the message inside the JSON structure that Discord expects to receive. Uses embeds for embedded rich content
 		// See: https://discordapp.com/developers/docs/resources/webhook#execute-webhook
@@ -161,11 +173,17 @@ class notification_service
 		curl_setopt($h, CURLOPT_URL, $discord_webhook_url);
 		curl_setopt($h, CURLOPT_POST, 1);
 		curl_setopt($h, CURLOPT_POSTFIELDS, $post);
-		// This shouldn't be done, but it wouldn't work otherwise because of SSL.
+		// This disables SSL. Its not ideal, but we don't expect to be transmitting sensitive data anyway.
 		curl_setopt ($h, CURLOPT_SSL_VERIFYHOST, 0);
 		curl_setopt ($h, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_exec($h);
+		$response = curl_exec($h);
 		curl_close($h);
+	}
+
+	private function generate_full_url($url)
+	{
+		// TODO: Return base URL of forum + url argument
+		return $url;
 	}
 
 	/**

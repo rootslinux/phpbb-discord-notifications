@@ -6,8 +6,6 @@ services:
         class: roots\discordnotifications\notification_service
         arguments:
             - '@config'
-            - '@config_text'
-            - '@user'
 
     roots.discordnotifications.listener:
         class: roots\discordnotifications\event\notification_event_listener
