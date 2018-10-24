@@ -20,16 +20,8 @@ class notification_service
 	// Reference: https://discordapp.com/developers/docs/resources/channel#embed-limits
 	const MAX_MESSAGE_SIZE = 2048;
 
-	// These numbers are decimal representations of hexadecimal color codes. Notifications can
-	// only select from the colors listed here.
-	private static $NOTIFICATION_TYPE_COLORS = array(
-		'default'	=> 11777212, // gray
-		'create'	=> 2993970,  // light green
-		'update'	=> 3580392,  // light blue
-		'delete'	=> 15217973, // light red
-		'lock'		=> 14050617, // orange
-		'user'		=> 14038504, // purple
-	);
+	// The notification color to use as a default if a missing or invalid color value is received.
+	const DEFAULT_COLOR = 11777212; // A gray color
 
 	/** @var \phpbb\config\config */
 	protected $config;
@@ -52,7 +44,7 @@ class notification_service
 	public function is_notification_type_enabled($notification_type)
 	{
 		// First check the global extension enabled setting. We don't generate any notifications if this is disabled
-		if ($this->config->get('discord_notifications_enabled') && $this->config->get($notification_type))
+		if ($this->config['discord_notifications_enabled'] == 1 && $this->config[$notification_type] == 1)
 		{
 			return true;
 		}
@@ -66,45 +58,22 @@ class notification_service
 	 * @param $forum_id The ID of the forum to check
 	 * @return False if the global notification setting is disabled, the notification type is disabled, or notifications are disabled for the forum
 	 */
-	public function is_forum_notification_type_enabled($notification_type, $forum_id)
+	public function is_notification_forum_enabled($forum_id)
 	{
-		if ($this->is_notification_type_enabled($notification_type) == false)
-		{
-			return false;
-		}
-
 		// TODO: Check the forum table to see if discord notifications are enabled on it
-		return true;
+		if ($this->config['discord_notifications_enabled'] == 1)
+		{
+			return true;
+		}
 	}
 
 	/**
-	 * Given the ID of a valid user, returns text that contains the user name with a link to their user profile.
-	 * @param $user_id The ID of the user
-	 * @return Text formatted in the notation that Discord would interpret. If the user ID is invalid, an empty string is returned.
+	 * Retrieve the value for the ACP settings configuration related to post preview length
+	 * @return The number of characters to display in the post preview. A zero value indicates that no preview should be displayed
 	 */
-	public function generate_user_name_link($user_id)
+	public function get_post_preview_length()
 	{
-		return "";
-	}
-
-	/**
-	 * Given the ID of a valid topic, returns text that contains the topic title with a link to the topic.
-	 * @param $topic_id The ID of the topic
-	 * @return Text formatted in the notation that Discord would interpret. If the topic ID is invalid, an empty string is returned.
-	 */
-	public function generate_topic_title_link($topic_id)
-	{
-		return "";
-	}
-
-	/**
-	 * Given the ID of a valid post, returns text that contains the post title with a link to the post.
-	 * @param $user_id The ID of the user
-	 * @return Text formatted in the notation that Discord would interpret. If the post ID is invalid, an empty string is returned.
-	 */
-	public function generate_post_title_link($post_id)
-	{
-		return "";
+		return $this->config['discord_notifications_post_preview_length'];
 	}
 
 	/**
@@ -138,7 +107,7 @@ class notification_service
 			return;
 		}
 
-		$this->send_message($discord_webhook_url, $message, 'default');
+		$this->send_message($discord_webhook_url, $message, NULL);
 	}
 
 	/**
@@ -149,20 +118,17 @@ class notification_service
 	 */
 	private function send_message($discord_webhook_url, $message, $color)
 	{
+		// Verify that we have a valid value for the color. Use the default color if this is not the case
+		if (is_integer($color) == false || $color <= 0)
+		{
+			$color = self::DEFAULT_COLOR;
+		}
+
 		// First analyze the message and replace characters that would cause issues with the JSON formatting
 		// Convert " to ' in the message to be sent as otherwise JSON formatting would break.
 		$message = str_replace('"', "'", $message);
 
 		// TODO: Verify that the message size is within the allowable limit and truncate if necessary
-
-		// Fetch the requested color value. If not found, use the default color
-		if (in_array($color, $NOTIFICATION_TYPE_COLORS) == true) {
-			$color = $NOTIFICATION_TYPE_COLORS[$color];
-		}
-		else {
-			$color = $NOTIFICATION_TYPE_COLORS['default'];
-		}
-
 
 		// Place the message inside the JSON structure that Discord expects to receive. Uses embeds for embedded rich content
 		// See: https://discordapp.com/developers/docs/resources/webhook#execute-webhook
@@ -178,22 +144,5 @@ class notification_service
 		curl_setopt ($h, CURLOPT_SSL_VERIFYPEER, 0);
 		$response = curl_exec($h);
 		curl_close($h);
-	}
-
-	private function generate_full_url($url)
-	{
-		// TODO: Return base URL of forum + url argument
-		return $url;
-	}
-
-	/**
-	 * The Discord webhook api does not accept urlencoded text. This function replaces problematic characters.
-	 */
-	private static function reformat_url($url)
-	{
-		$url = str_replace(" ", "%20", $url);
-		$url = str_replace("(", "%28", $url);
-		$url = str_replace(")", "%29", $url);
-		return $url;
 	}
 }
