@@ -13,8 +13,14 @@ namespace roots\discordnotifications\acp;
  */
 class discord_notifications_module
 {
-	// The maximum number of characters that the user can set for the max preview setting
-	const MAX_POST_PREVIEW_LENGTH = 2048;
+	// The minimum number of characters that the user can set for the post preview setting.
+	// Note that a zero value is valid and disables previews.
+	const MIN_POST_PREVIEW_LENGTH = 10;
+
+	// The maximum number of characters that the user can set for the post preview setting.
+	// Note that this is slightly less than the actual allowed maximum by Discord (2048), but we reserve
+	// some space to prepend the preview text with something like "Preview: " or "Reason: "
+	const MAX_POST_PREVIEW_LENGTH = 2000;
 
 	/** @var string */
 	public $page_title;
@@ -83,14 +89,14 @@ class discord_notifications_module
 			{
 				trigger_error($this->user->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
-			// Verify that the post preview length is a numeric value and within the valid range
-			if (is_numeric($preview_length) == false)
+			// Verify that the post preview length is an integer value and within the valid range
+			if (is_integer($preview_length) == false)
 			{
 				trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
-			elseif ($preview_length < 0 || $preview_length > self::MAX_POST_PREVIEW_LENGTH)
+			elseif (($preview_length < self::MIN_POST_PREVIEW_LENGTH || $preview_length > self::MAX_POST_PREVIEW_LENGTH) && $preview_length != 0)
 			{
-				trigger_error($this->user->lang('DN_POST_PREVIEW_BAD_VALUE') . adm_back_link($this->u_action), E_USER_WARNING);
+				trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
 			$this->config->set('discord_notifications_enabled', $master_enable);
