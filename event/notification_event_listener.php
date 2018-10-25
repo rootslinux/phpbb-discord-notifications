@@ -8,6 +8,103 @@
 
 namespace roots\discordnotifications\event;
 
+if (!defined('IN_PHPBB'))
+{
+	exit;
+}
+
+// TODO: temporary debugging function -- remove before any official release
+function dumpy($anything)
+{
+	global $phpbb_root_path;
+	$log_file = $phpbb_root_path . 'store/dn_ext.log';
+	$entry = print_r($anything, true) . PHP_EOL;
+	file_put_contents($log_file, $entry, FILE_APPEND | LOCK_EX);
+}
+
+/**
+ * The Discord webhook api does not accept urlencoded text. This function replaces problematic characters.
+ * @param $url
+ * @return Formatted URL text
+ */
+function reformat_link_url($url)
+{
+	$url = str_replace(" ", "%20", $url);
+	$url = str_replace("(", "%28", $url);
+	$url = str_replace(")", "%29", $url);
+	return $url;
+}
+
+/**
+ * Discord link text must be surrounded by []. This function replaces problematic characters
+ * @param $text Text link
+ * @return Formatted link-safe text
+ */
+function reformat_link_text($text)
+{
+	$text = str_replace("[", "(", $text);
+	$text = str_replace("]", ")", $text);
+	return $text;
+}
+
+/**
+ * Given the ID of a forum, returns text that contains a link to view the forum
+ * @param $topic_id The ID of the topic
+ * @param $post_id The ID of the post
+ * @param $text The text to display for the post link
+ * @return Text formatted in the notation that Discord would interpret.
+ */
+function generate_forum_link($forum_id, $text)
+{
+	$url = generate_board_url() . '/viewforum.php?f=' . $forum_id;
+	$url = reformat_link_url($url);
+	$text = reformat_link_text($text);
+	return sprintf('[%s](%s)', $text, $url);
+}
+
+/**
+ * Given the ID of a valid post, returns text that contains the post title with a link to the post.
+ * @param $topic_id The ID of the topic
+ * @param $post_id The ID of the post
+ * @param $text The text to display for the post link
+ * @return Text formatted in the notation that Discord would interpret.
+ */
+function generate_post_link($topic_id, $post_id, $text)
+{
+	$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id . '#p' . $post_id;
+	$url = reformat_link_url($url);
+	$text = reformat_link_text($text);
+	return sprintf('[%s](%s)', $text, $url);
+}
+
+/**
+ * Given the ID of a valid topic, returns text that contains the topic title with a link to the topic.
+ * @param $topic_id The ID of the topic
+ * @param $text The text to display for the topic link
+ * @return Text formatted in the notation that Discord would interpret.
+ */
+function generate_topic_link($topic_id, $text)
+{
+	$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id;
+	$url = reformat_link_url($url);
+	$text = reformat_link_text($text);
+	return sprintf('[%s](%s)', $text, $url);
+}
+
+/**
+ * Given the ID of a valid user, returns text that contains the user name with a link to their user profile.
+ * @param $user_id The ID of the user
+ * @param $text The text to display for the user link
+ * @return Text formatted in the notation that Discord would interpret.
+ */
+function generate_user_link($user_id, $text)
+{
+	$url = generate_board_url() . '/memberlist.php?mode=viewprofile&u=' . $user_id;
+	$url = reformat_link_url($url);
+	$text = reformat_link_text($text);
+	return sprintf('[%s](%s)', $text, $url);
+}
+
 /**
  * @ignore
  */
@@ -36,15 +133,6 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/** @var \roots\discordnotifications\notification_service */
 	protected $notification_service;
-
-	// TODO: temporary debugging function -- remove before any official release
-	public function dumpy($anything)
-	{
-		global $phpbb_root_path;
-		$log_file = $phpbb_root_path . 'store/dn_ext.log';
-		$entry = print_r($anything, true) . PHP_EOL;
-		file_put_contents($log_file, $entry, FILE_APPEND | LOCK_EX);
-	}
 
 	/**
 	 * Constructor
@@ -119,15 +207,15 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	public function handle_post_submit_action($event)
 	{
-		$this->dumpy('----- handle_post_submit_action');
-		$this->dumpy($event['url']);
-		$this->dumpy($event['mode']);
-		$this->dumpy($event['subject']);
-		$this->dumpy($event['topic_type']);
-		$this->dumpy($event['update_message']);
-		$this->dumpy($event['post_visibility']);
-		$this->dumpy($event['username']);
-		$this->dumpy($event['data']);
+		dumpy('----- handle_post_submit_action');
+		dumpy($event['url']);
+		dumpy($event['mode']);
+		dumpy($event['subject']);
+		dumpy($event['topic_type']);
+		dumpy($event['update_message']);
+		dumpy($event['post_visibility']);
+		dumpy($event['username']);
+		dumpy($event['data']);
 
 		// Check for visibility of the post/topic. We don't send notifications for topics that are hidden from normal users.
 		// Note that there are three visibility settings here. The first is the post visibility when it is generated. For example,
@@ -184,15 +272,15 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	public function handle_post_delete_action($event)
 	{
-		$this->dumpy('----- handle_post_delete_action');
-		$this->dumpy($event['forum_id']);
-		$this->dumpy($event['topic_id']);
-		$this->dumpy($event['post_id']);
-		$this->dumpy($event['next_post_id']);
-		$this->dumpy($event['post_mode']);
-		$this->dumpy($event['is_soft']);
-		$this->dumpy($event['softdelete_reason']);
-		$this->dumpy($event['data']);
+		dumpy('----- handle_post_delete_action');
+		dumpy($event['forum_id']);
+		dumpy($event['topic_id']);
+		dumpy($event['post_id']);
+		dumpy($event['next_post_id']);
+		dumpy($event['post_mode']);
+		dumpy($event['is_soft']);
+		dumpy($event['softdelete_reason']);
+		dumpy($event['data']);
 
 		// Check for visibility of the post/topic. We don't send notifications for content that is hidden from normal users.
 		if ($event['post_visibility'] == 0 || $event['data']['topic_visibility'] == 0 || $event['data']['post_visibility'] == 0)
@@ -235,10 +323,10 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	public function handle_post_lock_action($event)
 	{
-		$this->dumpy('----- handle_post_lock_action');
-		$this->dumpy($event['is_soft']);
-		$this->dumpy($event['softdelete_reason']);
-		$this->dumpy($event['data']);
+		dumpy('----- handle_post_lock_action');
+		dumpy($event['is_soft']);
+		dumpy($event['softdelete_reason']);
+		dumpy($event['data']);
 
 		return;
 	}
@@ -253,10 +341,10 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	public function handle_user_add_action($event)
 	{
-		$this->dumpy('----- handle_user_add_action');
-		$this->dumpy($event['user_id']);
-		$this->dumpy($event['cp_data']);
-		$this->dumpy($event['user_row']);
+		dumpy('----- handle_user_add_action');
+		dumpy($event['user_id']);
+		dumpy($event['cp_data']);
+		dumpy($event['user_row']);
 		return;
 	}
 
@@ -270,92 +358,12 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	public function handle_user_delete_action($event)
 	{
-		$this->dumpy('----- handle_user_delete_action');
-		$this->dumpy($event['user_ids']);
-		$this->dumpy($event['mode']);
-		$this->dumpy($event['retain_username']);
-		$this->dumpy($event['user_rows']);
+		dumpy('----- handle_user_delete_action');
+		dumpy($event['user_ids']);
+		dumpy($event['mode']);
+		dumpy($event['retain_username']);
+		dumpy($event['user_rows']);
 		return;
-	}
-
-	/**
-	 * The Discord webhook api does not accept urlencoded text. This function replaces problematic characters.
-	 */
-	private function reformat_link_url($url)
-	{
-		$url = str_replace(" ", "%20", $url);
-		$url = str_replace("(", "%28", $url);
-		$url = str_replace(")", "%29", $url);
-		return $url;
-	}
-
-	/**
-	 * Discord link text must be surrounded by []. This function replaces problematic characters
-	 */
-	private function reformat_link_text($text)
-	{
-		$text = str_replace("[", "(", $text);
-		$text = str_replace("]", ")", $text);
-		$text = reformat_link_text($text);
-		return sprintf('[%s](%s)', $text, $url);
-	}
-
-	/**
-	 * Given the ID of a forum, returns text that contains a link to view the forum
-	 * @param $topic_id The ID of the topic
-	 * @param $post_id The ID of the post
-	 * @param $text The text to display for the post link
-	 * @return Text formatted in the notation that Discord would interpret.
-	 */
-	private function generate_forum_link($forum_id, $text)
-	{
-		$url = generate_board_url() . '/viewforum.php?f=' . $forum_id;
-		$url = reformat_link_url($url);
-		$text = reformat_link_text($text);
-		return sprintf('[%s](%s)', $text, $url);
-	}
-
-	/**
-	 * Given the ID of a valid post, returns text that contains the post title with a link to the post.
-	 * @param $topic_id The ID of the topic
-	 * @param $post_id The ID of the post
-	 * @param $text The text to display for the post link
-	 * @return Text formatted in the notation that Discord would interpret.
-	 */
-	private function generate_post_link($topic_id, $post_id, $text)
-	{
-		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id . '#p' . $post_id;
-		$url = reformat_link_url($url);
-		$text = reformat_link_text($text);
-		return sprintf('[%s](%s)', $text, $url);
-	}
-
-	/**
-	 * Given the ID of a valid topic, returns text that contains the topic title with a link to the topic.
-	 * @param $topic_id The ID of the topic
-	 * @param $text The text to display for the topic link
-	 * @return Text formatted in the notation that Discord would interpret.
-	 */
-	private function generate_topic_link($topic_id, $text)
-	{
-		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id;
-		$url = reformat_link_url($url);
-		$text = reformat_link_text($text);
-		return sprintf('[%s](%s)', $text, $url);
-	}
-
-	/**
-	 * Given the ID of a valid user, returns text that contains the user name with a link to their user profile.
-	 * @param $user_id The ID of the user
-	 * @param $text The text to display for the user link
-	 * @return Text formatted in the notation that Discord would interpret.
-	 */
-	private function generate_user_link($user_id, $text)
-	{
-		$url = generate_board_url() . '/memberlist.php?mode=viewprofile&u=' . $user_id;
-		$url = reformat_link_url($url);
-		// TODO: check text for problematic characters like ']'
-		return "";
 	}
 
 	/**
@@ -374,18 +382,36 @@ class notification_event_listener implements EventSubscriberInterface
 			return;
 		}
 
-		// Construct the notification message using the argument data
-		$message = $emoji;
-		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
-		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
-		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
+		// Construct the notification message using the post data
+		$user_link = generate_user_link($data['user_id'], $data['user_name']);
+		$post_link = generate_post_link($data['topic_id'], $data['post_id'], 'post');
+		$topic_link = generate_topic_link($data['topic_id'], $data['topic_title']);
+		$forum_link = generate_forum_link($data['forum_id'], $data['forum_name']);
 		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
-		$message = sprintf('%s %s created a new post in the topic %s located in the forum %s',
-			$emoji, $user_link, $topic_link, $forum_link
+		$message = sprintf('%s %s created a new %s in the topic %s located in the forum %s',
+			$emoji, $user_link, $post_link, $topic_link, $forum_link
 		);
-		// TODO: generate post preview if needed with $data['content']
 
-		$this->notification_service->send_discord_notification($message, $color);
+		// Generate a post preview if required
+		$footer = NULL;
+		$preview_length = $this->notification_service->get_post_preview_length();
+		if ($preview_length > 0)
+		{
+			// TODO: figure out how to remove the tags/styling from the post text. New lines in previews break notification.
+			$footer = $data['content'];
+
+			// Truncate the preview if the post content is too long and add '...' for the last three characters.
+			// The length will always be at least 10 characters so we don't need to worry about really short strings.
+			if (strlen($footer) > $preview_length)
+			{
+				$footer = substr($footer, 0, $preview_length - 3) . '...';
+			}
+
+			// Prepend a little text to the footer so it's clear that we're sharing the post content
+			$footer = 'Preview: ' . $footer;
+		}
+
+		$this->notification_service->send_discord_notification($color, $message, $footer);
 	}
 
 	/**
@@ -404,11 +430,20 @@ class notification_event_listener implements EventSubscriberInterface
 			return;
 		}
 
-		// Construct the notification message using the argument data
-		$message = $emoji;
-		$message .= $notification_type_config_name;
+		// Construct the notification message using the post data
+		$user_link = generate_user_link($data['user_id'], $data['user_name']);
+		$post_link = generate_post_link($data['topic_id'], $data['post_id'], 'post');
+		$topic_link = generate_topic_link($data['topic_id'], $data['topic_title']);
+		$forum_link = generate_forum_link($data['forum_id'], $data['forum_name']);
 
-		$this->notification_service->send_discord_notification($message, $color);
+		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
+		$message = sprintf('%s %s edited their %s in the topic %s located in the forum %s',
+			$emoji, $user_link, $post_link, $topic_link, $forum_link
+		);
+		// TODO: generate post preview if needed with $data['content']
+
+
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -427,11 +462,18 @@ class notification_event_listener implements EventSubscriberInterface
 			return;
 		}
 
-		// Construct the notification message using the argument data
-		$message = $emoji;
-		$message .= $notification_type_config_name;
+		// Construct the notification message using the post data
+		$user_link = generate_user_link($data['user_id'], $data['user_name']);
+		$topic_link = generate_topic_link($data['topic_id'], $data['topic_title']);
+		$forum_link = generate_forum_link($data['forum_id'], $data['forum_name']);
 
-		$this->notification_service->send_discord_notification($message, $color);
+		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
+		$message = sprintf('%s %s deleted their post in the topic %s located in the forum %s',
+			$emoji, $user_link, $topic_link, $forum_link
+		);
+		// TODO: generate post preview if needed with $data['content']
+
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -454,7 +496,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = $emoji;
 		$message .= $notification_type_config_name;
 
-		$this->notification_service->send_discord_notification($message, $color);
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -477,7 +519,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = $emoji;
 		$message .= $notification_type_config_name;
 
-		$this->notification_service->send_discord_notification($message, $color);
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -497,17 +539,16 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Construct the notification message using the argument data
-		$message = $emoji;
-		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
-		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
-		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
+		$user_link = generate_user_link($data['user_id'], $data['user_name']);
+		$forum_link = generate_forum_link($data['forum_id'], $data['forum_name']);
+		$topic_link = generate_topic_link($data['topic_id'], $data['topic_title']);
 		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
 		$message = sprintf('%s %s created a new topic titled %s in the %s forum',
 			$emoji, $user_link, $topic_link, $forum_link
 		);
 		// TODO: generate post preview if needed with $data['content']
 
-		$this->notification_service->send_discord_notification($message, $color);
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -530,7 +571,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = $emoji;
 		$message .= $notification_type_config_name;
 
-		$this->notification_service->send_discord_notification($message, $color);
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -553,7 +594,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = $emoji;
 		$message .= $notification_type_config_name;
 
-		$this->notification_service->send_discord_notification($message, $color);
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -576,7 +617,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = $emoji;
 		$message .= $notification_type_config_name;
 
-		$this->notification_service->send_discord_notification($message, $color);
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -599,7 +640,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = $emoji;
 		$message .= $notification_type_config_name;
 
-		$this->notification_service->send_discord_notification($message, $color);
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -626,7 +667,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = $emoji;
 		$message .= $notification_type_config_name;
 
-		$this->notification_service->send_discord_notification($message, $color);
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 
 	/**
@@ -649,6 +690,6 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = $emoji;
 		$message .= $notification_type_config_name;
 
-		$this->notification_service->send_discord_notification($message, $color);
+		$this->notification_service->send_discord_notification($color, $message);
 	}
 }
