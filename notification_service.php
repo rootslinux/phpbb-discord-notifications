@@ -150,13 +150,16 @@ class notification_service
 		}
 
 		// Clean up the message and footer text before sending by trimming whitespace from the front and end of the message and footer strings.
-		// Replace any " characters with '. This is necessary because " characters will break the JSON encoding that our message must be wrapped in.
+		// TODO: newline characters actually should work...
 		$message = trim($message);
-		$message = str_replace('"', "'", $message);
+		$message = str_replace('"', "'", $message); // Replace " characters that would break the JSON encoding that our message must be wrapped in.
+		$message = str_replace(array("\r", "\n"), ' ', $message); // Newline characters will break messages as well
 		if (isset($footer))
 		{
 			$footer = trim($footer);
 			$footer = str_replace('"', "'", $footer);
+			$footer = str_replace('"', "'", $footer);
+			$footer = str_replace(array("\r", "\n"), ' ', $footer);
 		}
 
 		// Abort if we find that either of our text fields are now empty strings
@@ -199,8 +202,8 @@ class notification_service
 		curl_setopt($h, CURLOPT_POST, 1);
 		curl_setopt($h, CURLOPT_POSTFIELDS, $post);
 		// This disables SSL. Its not ideal, but we don't expect to be transmitting sensitive data anyway.
-		curl_setopt ($h, CURLOPT_SSL_VERIFYHOST, 0);
-		curl_setopt ($h, CURLOPT_SSL_VERIFYPEER, 0);
+// 		curl_setopt($h, CURLOPT_SSL_VERIFYHOST, 1);
+// 		curl_setopt($h, CURLOPT_SSL_VERIFYPEER, 1);
 		$response = curl_exec($h);
 		curl_close($h);
 
