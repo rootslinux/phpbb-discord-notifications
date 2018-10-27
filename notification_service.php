@@ -29,20 +29,24 @@ class notification_service
 	/** @var \phpbb\config\config */
 	protected $config;
 
+	/** @var \phpbb\db\driver\driver_interface */
+	protected $db;
+
 	/**
 	 * Constructor
 	 *
 	 * @param \phpbb\config\config $config
 	 */
-	public function __construct(\phpbb\config\config $config)
+	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db)
 	{
 		$this->config = $config;
+		$this->db = $db;
 	}
 
 	/**
 	 * Check whether notifications are enabled for a certain type
 	 * @param $notification_type The name of the notification type to check
-	 * @return False if the global notification setting is disabled or the notification type is disabled
+	 * @return False if the global notification setting is disabled or this notification type is disabled
 	 */
 	public function is_notification_type_enabled($notification_type)
 	{
@@ -58,17 +62,23 @@ class notification_service
 	/**
 	 * Check whether notifications that occur on a specific forum should be generated
 	 * @param $forum_id The ID of the forum to check
-	 * @return False if the global notification setting is disabled, the notification type is disabled, or notifications are disabled for the forum
+	 * @return False if the global notification setting is disabled, notifications are disabled for the forum, or no forum exists with this ID
 	 */
 	public function is_notification_forum_enabled($forum_id)
 	{
-		// TODO: Check the forum table to see if discord notifications are enabled on it
-		if ($this->config['discord_notifications_enabled'] == 1)
+		if ($this->config['discord_notifications_enabled'] == 0)
 		{
-			return true;
+			return false;
 		}
 
-		return false;
+		// Query the forum table where forum notification settings are stored
+		$sql = "SELECT discord_notifications_enabled FROM " . FORUMS_TABLE . " WHERE forum_id = $forum_id";
+		$result = $this->db->sql_query($sql);
+		$data = $this->db->sql_fetchrow($result);
+		$enabled = $data['discord_notifications_enabled'] == 1 ? true : false;
+		$this->db->sql_freeresult($result);
+
+		return $enabled;
 	}
 
 	/**
@@ -201,9 +211,6 @@ class notification_service
 		curl_setopt($h, CURLOPT_URL, $discord_webhook_url);
 		curl_setopt($h, CURLOPT_POST, 1);
 		curl_setopt($h, CURLOPT_POSTFIELDS, $post);
-		// This disables SSL. Its not ideal, but we don't expect to be transmitting sensitive data anyway.
-// 		curl_setopt($h, CURLOPT_SSL_VERIFYHOST, 1);
-// 		curl_setopt($h, CURLOPT_SSL_VERIFYPEER, 1);
 		$response = curl_exec($h);
 		curl_close($h);
 

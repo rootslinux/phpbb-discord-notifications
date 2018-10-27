@@ -6,6 +6,7 @@ services:
         class: roots\discordnotifications\notification_service
         arguments:
             - '@config'
+            - '@dbal.conn'
 
     roots.discordnotifications.listener:
         class: roots\discordnotifications\event\notification_event_listener
