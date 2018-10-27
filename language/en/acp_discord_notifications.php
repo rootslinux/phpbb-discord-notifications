@@ -48,7 +48,7 @@ $lang = array_merge($lang, array(
 	'DN_USER_DELETE'				=> 'User deleted',
 
 	'DN_FORUM_SETTINGS'				=> 'Notification Forums',
-	'DN_FORUM_DESCRIPTION'			=> 'Enable or disable notifications for event types that are generated within a forum, such as posts and topics',
+	'DN_FORUM_DESCRIPTION'			=> 'Select which forums should generate notifications for forum-specific events, such as those related to posts and topics',
 
 	// Success/Failure messages that can be generated once the user saves
 	'DN_SETTINGS_SAVED'				=> 'Discord Notification settings modified successfully.',

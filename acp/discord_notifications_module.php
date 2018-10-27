@@ -37,6 +37,12 @@ class discord_notifications_module
 	/** @var \phpbb\config\config */
 	protected $config;
 
+	/** @var \phpbb\db\driver\driver_interface */
+	protected $db;
+
+	/** @var \phpbb\language\language */
+	protected $language;
+
 	/** @var \phpbb\log\log */
 	protected $log;
 
@@ -54,6 +60,8 @@ class discord_notifications_module
 		global $phpbb_container;
 		$this->cache = $phpbb_container->get('cache.driver');
 		$this->config = $phpbb_container->get('config');
+		$this->db = $phpbb_container->get('dbal.conn');
+		$this->language = $phpbb_container->get('language');
 		$this->log = $phpbb_container->get('log');
 		$this->request = $phpbb_container->get('request');
 		$this->template = $phpbb_container->get('template');
@@ -89,12 +97,13 @@ class discord_notifications_module
 			{
 				trigger_error($this->user->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
-			// Verify that the post preview length is an integer value and within the valid range
-			if (is_integer($preview_length) == false)
+			// Verify that the post preview length is a numeric string, convert to an int and check the valid range
+			if (is_numeric($preview_length) == false)
 			{
-				trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
+				trigger_error('DERP' . adm_back_link($this->u_action), E_USER_WARNING);
 			}
-			elseif (($preview_length < self::MIN_POST_PREVIEW_LENGTH || $preview_length > self::MAX_POST_PREVIEW_LENGTH) && $preview_length != 0)
+			$preview_length = (int)$preview_length;
+			if (($preview_length < self::MIN_POST_PREVIEW_LENGTH || $preview_length > self::MAX_POST_PREVIEW_LENGTH) && $preview_length != 0)
 			{
 				trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
@@ -126,6 +135,8 @@ class discord_notifications_module
 			trigger_error($this->user->lang('DN_SETTINGS_SAVED') . adm_back_link($this->u_action));
 		}
 
+		$forum_section_html = $this->generate_forum_section();
+
 		$this->template->assign_vars(array(
 			'DN_MASTER_ENABLE'			=> $this->config['discord_notifications_enabled'],
 			'DN_WEBHOOK_URL'			=> $this->config['discord_notifications_webhook_url'],
@@ -147,7 +158,57 @@ class discord_notifications_module
 			'DN_USER_CREATE'			=> $this->config['discord_notification_type_user_create'],
 			'DN_USER_DELETE'			=> $this->config['discord_notification_type_user_delete'],
 
+			'DN_FORUM_SECTION'			=> $forum_section_html,
+
 			'U_ACTION'					=> $this->u_action,
 		));
+	}
+
+	/**
+	 * Generates the section of the ACP page listing all of the forums, in order, with the radio button option
+	 * that allows the user to enable or disable discord notifications for that forum.
+	 *
+	 * @return HTML to render for the forum section
+	 */
+	private function generate_forum_section()
+	{
+		$sql = 'SELECT forum_id, forum_type, forum_name, discord_notifications_enabled FROM ' . FORUMS_TABLE . ' ORDER BY left_id ASC';
+		$result = $this->db->sql_query($sql);
+
+		// Grab the raw language values to insert here. We must do this because if we used {L_YES} or another label in the HTML text,
+		// it will not get interpretted like it otherwise would if it was static content in the .html file.
+		$colon = $this->language->lang_raw('COLON');
+		$yes = $this->language->lang_raw('YES');
+		$no = $this->language->lang_raw('NO');
+
+		$html = '';
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			// Category forums are displayed for organizational purposes, but have no configuration
+			if ($row['forum_type'] == FORUM_CAT)
+			{
+				$html .= "<dl>\n"
+					. "<dt><label><u>" . $row['forum_name'] . "</u></label></dt>\n"
+					. "</dl>\n";
+			}
+			// Normal forums have a radio input with the value selected basd on the value of the discord_notifications_enabled setting
+			else if ($row['forum_type'] == FORUM_POST)
+			{
+				// The labels for all the inputs are constructed based on the forum IDs to make it easy
+				$input_name = "forum_" . $row['forum_id'];
+				$yes_checked = $row['discord_notifications_enabled'] == 1 ? 'checked' : '';
+				$no_checked = $yes_checked === '' ? 'checked' : '';
+				$html .= "<dl>\n"
+					. "<dt><label for=" . $input_name . ">" . $row['forum_name'] . $colon . "</label></dt>\n"
+					. "<dd>\n"
+					. "<label><input type=\"radio\" class=\"radio\" name=\"" . $input_name . "\" value=\"1\" " . $yes_checked . "/>" . $yes . "</label>\n"
+					. "<label><input type=\"radio\" class=\"radio\" name=\"" . $input_name . "\" value=\"0\" " . $no_checked . "/>" . $no ."</label>\n"
+					. "</dd>\n"
+					. "</dl>\n";
+			}
+			// Other forum types (links) are ignored
+		}
+
+		return $html;
 	}
 }
