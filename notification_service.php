@@ -97,7 +97,7 @@ class notification_service
 	 * @param $message The message text to send.
 	 * @param $footer Text to place in the footer of the message. Optional.
 	 */
-	public function send_discord_notification($color, $message, $footer)
+	public function send_discord_notification($color, $message, $footer = NULL)
 	{
 		if ($this->config['discord_notifications_enabled'] == 0 || isset($message) == false)
 		{
@@ -139,7 +139,7 @@ class notification_service
 	 * @return Boolean indicating whether the message transmission resulted in success or failure.
 	 * @see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
 	 */
-	private function send_message($discord_webhook_url, $color, $message, $footer)
+	private function send_message($discord_webhook_url, $color, $message, $footer = NULL)
 	{
 		if (isset($discord_webhook_url) == false || $discord_webhook_url === '')
 		{
