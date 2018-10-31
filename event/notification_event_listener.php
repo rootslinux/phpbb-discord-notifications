@@ -22,106 +22,6 @@ function dumpy($anything)
 	file_put_contents($log_file, $entry, FILE_APPEND | LOCK_EX);
 }
 
-
-function get_user_name($user_id)
-{
-	global $phpbb_root_path, $phpEx;
-
-	include($phpbb_root_path . 'includes/functions_user.' . $phpEx);
-
-	$user_names = array();
-// 	user_get_id_name(array($post_data['user_id']), $user_names);
-	if (count($user_names) == 1)
-	{
-		return $user_names[0];
-	}
-
-	return '';
-}
-
-/**
- * The Discord webhook api does not accept urlencoded text. This function replaces problematic characters.
- * @param $url
- * @return Formatted URL text
- */
-function reformat_link_url($url)
-{
-	$url = str_replace(" ", "%20", $url);
-	$url = str_replace("(", "%28", $url);
-	$url = str_replace(")", "%29", $url);
-	return $url;
-}
-
-/**
- * Discord link text must be surrounded by []. This function replaces problematic characters
- * @param $text Text link
- * @return Formatted link-safe text
- */
-function reformat_link_text($text)
-{
-	$text = str_replace("[", "(", $text);
-	$text = str_replace("]", ")", $text);
-	return $text;
-}
-
-/**
- * Given the ID of a forum, returns text that contains a link to view the forum
- * @param $topic_id The ID of the topic
- * @param $post_id The ID of the post
- * @param $text The text to display for the post link
- * @return Text formatted in the notation that Discord would interpret.
- */
-function generate_forum_link($forum_id, $text)
-{
-	$url = generate_board_url() . '/viewforum.php?f=' . $forum_id;
-	$url = reformat_link_url($url);
-	$text = reformat_link_text($text);
-	return sprintf('[%s](%s)', $text, $url);
-}
-
-/**
- * Given the ID of a valid post, returns text that contains the post title with a link to the post.
- * @param $topic_id The ID of the topic
- * @param $post_id The ID of the post
- * @param $text The text to display for the post link
- * @return Text formatted in the notation that Discord would interpret.
- */
-function generate_post_link($topic_id, $post_id, $text)
-{
-	$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id . '#p' . $post_id;
-	$url = reformat_link_url($url);
-	$text = reformat_link_text($text);
-	return sprintf('[%s](%s)', $text, $url);
-}
-
-/**
- * Given the ID of a valid topic, returns text that contains the topic title with a link to the topic.
- * @param $topic_id The ID of the topic
- * @param $text The text to display for the topic link
- * @return Text formatted in the notation that Discord would interpret.
- */
-function generate_topic_link($topic_id, $text)
-{
-	$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id;
-	$url = reformat_link_url($url);
-	$text = reformat_link_text($text);
-	return sprintf('[%s](%s)', $text, $url);
-}
-
-/**
- * Given the ID of a valid user, returns text that contains the user name with a link to their user profile.
- * @param $user_id The ID of the user
- * @param $text The text to display for the user link
- * @return Text formatted in the notation that Discord would interpret.
- */
-function generate_user_link($user_id, $text)
-{
-	$url = generate_board_url() . '/memberlist.php?mode=viewprofile&u=' . $user_id;
-	$url = reformat_link_url($url);
-	$text = reformat_link_text($text);
-	return sprintf('[%s](%s)', $text, $url);
-}
-
 /**
  * @ignore
  */
@@ -176,9 +76,11 @@ class notification_event_listener implements EventSubscriberInterface
 			// This event is used for performing actions directly after a post or topic has been submitted.
 			'core.submit_post_end'				=> 'handle_post_submit_action',
 			// This event is used for performing actions directly after a post or topic has been deleted.
-			'core.delete_post_after'			=> 'handle_post_delete_action',
+			'core.delete_post_after'			=> 'handle_post_delete_action', // TODO: also consider listening for delete_posts_after
 			// ???
-			'core.delete_posts_in_transaction'	=> 'handle_topic_delete_action',
+// 			'core.delete_posts_in_transaction'	=> 'handle_topic_delete_action',
+			// Perform additional actions before topic(s) deletion
+			'core.delete_topics_before_query'	=> 'handle_topic_delete_action',
 			// Perform additional actions after locking/unlocking topics
 			'core.mcp_lock_unlock_after'		=> 'handle_topic_lock_action',
 			// Event that returns user id, user details and user CPF of newly registered user
@@ -189,20 +91,12 @@ class notification_event_listener implements EventSubscriberInterface
 			'core.user_active_flip_after'		=> 'handle_user_activate_action',
 			// Event after a user is deleted
 			'core.delete_user_after'			=> 'handle_user_delete_action',
-
-// 			// This event is used for performing actions directly after a post or topic
-// 			// has been submitted. When a new topic is posted, the topic ID is
-// 			// available in the $data array.
-// 			'core.submit_post_end' => 'notify_post_created',
-
-// 			// This event is used for performing actions directly after a post or topic has been deleted.
-// 			// TODO: also consider listening for delete_posts_after
-// 			'core.delete_post_after' => 'notify_post_deleted',
-
-// 			// Event to modify the post data for the MCP topic review before assigning the posts
-// 			'core.mcp_topic_modify_post_data' => 'notify_topic_updated',
 		);
 	}
+
+	// -----------------------------------------------------------------------
+	// ----------------------- Event Handler Functions -----------------------
+	// -----------------------------------------------------------------------
 
 	/**
 	 * Handles events generated by submitting a post. This could result in a single notification being sent among several notification types.
@@ -212,12 +106,11 @@ class notification_event_listener implements EventSubscriberInterface
 	 * - New post created
 	 * - Post updated
 	 * - New topic created
-	 * - TODO: topic updated?
+	 * - Topic updated
 	 */
 	public function handle_post_submit_action($event)
 	{
 		dumpy('----- handle_post_submit_action');
-		dumpy($event['url']);
 		dumpy($event['mode']);
 		dumpy($event['subject']);
 		dumpy($event['topic_type']);
@@ -226,13 +119,13 @@ class notification_event_listener implements EventSubscriberInterface
 		dumpy($event['username']);
 		dumpy($event['data']);
 
-		// Check for visibility of the post/topic. We don't send notifications for topics that are hidden from normal users.
+		// Check for visibility of the post/topic. We don't send notifications for content that are hidden from normal users.
 		// Note that there are three visibility settings here. The first is the post visibility when it is generated. For example,
 		// users may require moderator approval before their posts appear. The other two are the existing visibility status of the topic and post.
-// 		if ($event['post_visibility'] == 0 || $event['data']['topic_visibility'] == 0 || $event['data']['post_visibility'] == 0)
-// 		{
-// 			return;
-// 		}
+		if ($event['post_visibility'] === 0 || $event['data']['topic_visibility'] === 0 || $event['data']['post_visibility'] === 0)
+		{
+			return;
+		}
 
 		// Verify that the forum that the post submit action happened in has notifications enabled. If not we have nothing further to do
 		if ($this->notification_service->is_notification_forum_enabled($event['data']['forum_id']) == false)
@@ -242,20 +135,35 @@ class notification_event_listener implements EventSubscriberInterface
 
 		// Build an array of the event data that we may need to pass along to the function that will construct the notification message
 		$post_data = array(
-			'user_id'		=> $event['data']['poster_id'],
-			'user_name'		=> $event['username'],
-			'forum_id'		=> $event['data']['forum_id'],
-			'forum_name'	=> $event['data']['forum_name'],
-			'topic_id'		=> $event['data']['topic_id'],
-			'topic_title'	=> $event['data']['topic_title'],
-			'post_id'		=> $event['data']['post_id'],
-			'post_title'	=> $event['subject'],
-			'edit_user_id'	=> $event['data']['post_edit_user'],
-			'edit_reason'	=> $event['data']['post_edit_reason'],
-			'content'		=> $event['data']['message'],
+			'user_id'			=> $event['data']['poster_id'],
+			'user_name'			=> $event['username'],
+			'forum_id'			=> $event['data']['forum_id'],
+			'forum_name'		=> $event['data']['forum_name'],
+			'topic_id'			=> $event['data']['topic_id'],
+			'topic_title'		=> $event['data']['topic_title'],
+			'post_id'			=> $event['data']['post_id'],
+			'post_title'		=> $event['subject'],
+			'edit_user_id'		=> $event['data']['post_edit_user'],
+			'edit_user_name'	=> '{user}',
+			'edit_reason'		=> $event['data']['post_edit_reason'],
+			'content'			=> $event['data']['message'],
 		);
 
-		// Finally, based on the event data determine which kind of notification we need to send
+		if ($post_data['edit_user_id'] == $post_data['user_id'])
+		{
+			$post_data['edit_user_name'] = $post_data['user_name'];
+		}
+		else
+		{
+			$post_data['edit_user_name'] = '{user}';
+			$edit_name = $this->notification_service->get_user_name($post_data['edit_user_id']);
+			if ($edit_name != null)
+			{
+				$post_data['edit_user_name'] = $edit_name;
+			}
+		}
+
+		// Finally, based on the event characteristics we determine which kind of notification we need to send
 		if ($event['mode'] == 'post') // New topic
 		{
 			$this->notify_topic_created($post_data);
@@ -264,10 +172,18 @@ class notification_event_listener implements EventSubscriberInterface
 		{
 			$this->notify_post_created($post_data);
 		}
-		elseif ($event['mode'] == 'edit') // Edit topic, edit post, or edit post lock status
+		elseif ($event['mode'] == 'edit') // Edit existing post
 		{
-			// TODO
-			$this->notify_post_updated($post_data);
+			// If the post that was edited is the first one in the topic, we consider this a topic update event.
+			if ($event['data']['post_id'] == $event['data']['topic_first_post_id'])
+			{
+				$this->notify_topic_updated($post_data);
+			}
+			// Otherwise we treat this as a post update event.
+			else
+			{
+				$this->notify_post_updated($post_data);
+			}
 		}
 	}
 
@@ -307,21 +223,30 @@ class notification_event_listener implements EventSubscriberInterface
 		// Note: unfortunately, the event data does not give us any information indicating which user deleted the post
 		$post_data = array(
 			'user_id'		=> $event['data']['poster_id'],
-			'user_name'		=> '',
+			'user_name'		=> '{user}',
 			'forum_id'		=> $event['forum_id'],
-			'forum_name'	=> '',
+			'forum_name'	=> '{forum}',
 			'topic_id'		=> $event['topic_id'],
-			'topic_title'	=> '',
+			'topic_title'	=> '{title}',
 			'post_id'		=> $event['post_id'],
 			'delete_reason'	=> $event['softdelete_reason'],
 		);
 
-		// Fetch the poster's user name, forum name, and topic title using the respective IDs.
-		// TODO
-		$username = get_user_name($post_data['user_id']);
-		if ($username !== '')
+		// Fetch the forum name, topic title, and user name using the respective IDs.
+		$forum_name = $this->notification_service->get_forum_name($post_data['forum_id']);
+		if ($forum_name != null)
 		{
-			$post_data['user_name'] = $username;
+			$post_data['forum_name'] = $forum_name;
+		}
+		$topic_title = $this->notification_service->get_topic_title($post_data['topic_id']);
+		if ($topic_title != null)
+		{
+			$post_data['topic_title'] = $topic_title;
+		}
+		$user_name = $this->notification_service->get_user_name($post_data['user_id']);
+		if ($user_name != null)
+		{
+			$post_data['user_name'] = $user_name;
 		}
 
 		$this->notify_post_deleted($post_data);
@@ -329,7 +254,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Handles events generated by deleting a post. This could result in a single notification being sent among several notification types.
-	 * @param \phpbb\event\data	$event Event object -- [???]
+	 * @param \phpbb\event\data	$event Event object -- [???] table_ary, topic_ids
 	 *
 	 * The possible notifications that can be generated as a result of these events include:
 	 * - Post deleted
@@ -339,11 +264,13 @@ class notification_event_listener implements EventSubscriberInterface
 	{
 		dumpy('----- handle_topic_delete_action');
 		// delete_notifications_types, forum_ids, post_ids, poster_ids, topic_ids, where_ids, where_type
-		dumpy($event['forum_ids']);
+// 		dumpy($event['forum_ids']);
+// 		dumpy($event['topic_ids']);
+// 		dumpy($event['post_ids']);
+// 		dumpy($event['poster_ids']);
+// 		dumpy($event['delete_notifications_types']);
 		dumpy($event['topic_ids']);
-		dumpy($event['post_ids']);
-		dumpy($event['poster_ids']);
-		dumpy($event['delete_notifications_types']);
+		dumpy($event['table_ary']);
 
 		// Each ids array is the same length. 0th element represents top post
 	}
@@ -462,7 +389,8 @@ class notification_event_listener implements EventSubscriberInterface
 		elseif ($event['activated'] == 1)
 		{
 			$user_data['user_id'] = array_pop($event['user_id_ary']);
-			$user_data['user_name'] = '{unknown user}'; // TODO: get the actual user's name
+			$user_name = $this->notification_service->get_user_name($user_data['user_id']);
+			$post_data['user_name'] = ($user_name != null) ? $user_name : '{user}';
 		}
 		// Ignore deactivated user case
 		else
@@ -495,6 +423,10 @@ class notification_event_listener implements EventSubscriberInterface
 		$this->notify_users_deleted($user_data);
 	}
 
+	// ---------------------------------------------------------------------------------
+	// ----------------------- Notification Generation Functions -----------------------
+	// ---------------------------------------------------------------------------------
+
 	/**
 	 * Sends a notification to Discord when a new post is created.
 	 * @param $data Array of attributes for the new post
@@ -512,17 +444,17 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Construct the notification message using the post data
-		$user_link = generate_user_link($data['user_id'], $data['user_name']);
-		$post_link = generate_post_link($data['topic_id'], $data['post_id'], 'post');
-		$topic_link = generate_topic_link($data['topic_id'], $data['topic_title']);
-		$forum_link = generate_forum_link($data['forum_id'], $data['forum_name']);
+		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
+		$post_link = $this->generate_post_link($data['topic_id'], $data['post_id'], 'post');
+		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
+		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
 		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
 		$message = sprintf('%s %s created a new %s in the topic %s located in the forum %s',
 			$emoji, $user_link, $post_link, $topic_link, $forum_link
 		);
 
 		// Generate a post preview if necessary
-		$footer = NULL;
+		$footer = null;
 		$preview_length = $this->notification_service->get_post_preview_length();
 		if ($preview_length > 0)
 		{
@@ -560,19 +492,50 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Construct the notification message using the post data
-		$user_link = generate_user_link($data['user_id'], $data['user_name']);
-		$post_link = generate_post_link($data['topic_id'], $data['post_id'], 'post');
-		$topic_link = generate_topic_link($data['topic_id'], $data['topic_title']);
-		$forum_link = generate_forum_link($data['forum_id'], $data['forum_name']);
+		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
+		$post_link = $this->generate_post_link($data['topic_id'], $data['post_id'], 'post');
+		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
+		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
 
-		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
-		$message = sprintf('%s %s edited their %s in the topic %s located in the forum %s',
-			$emoji, $user_link, $post_link, $topic_link, $forum_link
-		);
-		// TODO: generate post preview if needed with $data['content']
+		// The notification is slightly different depending on whether the user edited their own post, or another user made the edit.
+		$message = '';
+		if ($data['user_id'] == $data['edit_user_id'])
+		{
+			$message = sprintf('%s %s edited their %s in the topic %s located in the forum %s',
+				$emoji, $user_link, $post_link, $topic_link, $forum_link
+			);
+		}
+		else
+		{
+			// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
+			$edit_user_link = $this->generate_user_link($data['edit_user_id'], $data['edit_user_name']);
+			$message = sprintf('%s %s edited the %s written by %s in the topic %s located in the forum %s',
+				$emoji, $edit_user_link, $post_link, $user_link, $topic_link, $forum_link
+			);
+		}
 
+		// If an edit reason was given, add that information in the footer
+		$footer = null;
+		if (isset($data['edit_reason']) && $data['edit_reason'] !== '')
+		{
+			$preview_length = $this->notification_service->get_post_preview_length();
+			if ($preview_length > 0)
+			{
+				$footer = $data['edit_reason'];
 
-		$this->notification_service->send_discord_notification($color, $message);
+				// Truncate the preview if the edit reason is too long and add '...' for the last three characters.
+				// The length will always be at least 10 characters so we don't need to worry about really short strings.
+				if (strlen($footer) > $preview_length)
+				{
+					$footer = substr($footer, 0, $preview_length - 3) . '...';
+				}
+
+				// Prepend a little text to the footer so that it's clear what we're sharing
+				$footer = 'Reason: ' . $footer;
+			}
+		}
+
+		$this->notification_service->send_discord_notification($color, $message, $footer);
 	}
 
 	/**
@@ -593,11 +556,11 @@ class notification_event_listener implements EventSubscriberInterface
 
 		// Construct the notification message using the post data.
 		$user_name = $data['user_name'] !== '' ? $data['user_name'] : '{user}';
-		$user_link = generate_user_link($data['user_id'], $user_name);
+		$user_link = $this->generate_user_link($data['user_id'], $user_name);
 		$topic_title = $data['topic_title'] !== '' ? $data['topic_title'] : '{topic}';
-		$topic_link = generate_topic_link($data['topic_id'], $topic_title);
+		$topic_link = $this->generate_topic_link($data['topic_id'], $topic_title);
 		$forum_name = $data['forum_name'] !== '' ? $data['forum_name'] : '{forum}';
-		$forum_link = generate_forum_link($data['forum_id'], $forum_name);
+		$forum_link = $this->generate_forum_link($data['forum_id'], $forum_name);
 
 		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
 		$message = sprintf('%s Deleted post by user %s in the topic %s located in the forum %s',
@@ -685,30 +648,30 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Construct the notification message using the argument data
-		$user_link = generate_user_link($data['user_id'], $data['user_name']);
-		$forum_link = generate_forum_link($data['forum_id'], $data['forum_name']);
-		$topic_link = generate_topic_link($data['topic_id'], $data['topic_title']);
+		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
+		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
+		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
 		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
 		$message = sprintf('%s %s created a new topic titled %s in the %s forum',
 			$emoji, $user_link, $topic_link, $forum_link
 		);
 
-		// Generate a post preview if necessary
-		$footer = NULL;
+		// Generate a topic preview if necessary
+		$footer = null;
 		$preview_length = $this->notification_service->get_post_preview_length();
 		if ($preview_length > 0)
 		{
 			// TODO: figure out how to remove the tags/styling from the post text.
 			$footer = $data['content'];
 
-			// Truncate the preview if the post content is too long and add '...' for the last three characters.
+			// Truncate the preview if the topic content is too long and add '...' for the last three characters.
 			// The length will always be at least 10 characters so we don't need to worry about really short strings.
 			if (strlen($footer) > $preview_length)
 			{
 				$footer = substr($footer, 0, $preview_length - 3) . '...';
 			}
 
-			// Prepend a little text to the footer so it's clear that we're sharing the post content
+			// Prepend a little text to the footer so it's clear that we're sharing the topic content
 			$footer = 'Preview: ' . $footer;
 		}
 
@@ -731,11 +694,50 @@ class notification_event_listener implements EventSubscriberInterface
 			return;
 		}
 
-		// Construct the notification message using the argument data
-		$message = $emoji;
-		$message .= $notification_type_config_name;
+		// Construct the notification message using the topic data
+		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
+		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
+		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
 
-		$this->notification_service->send_discord_notification($color, $message);
+		// The notification is slightly different depending on whether the user edited their own topic, or another user made the edit
+		$message = '';
+		if ($data['user_id'] == $data['edit_user_id'])
+		{
+			$message = sprintf('%s %s edited their topic %s located in the forum %s',
+				$emoji, $user_link, $topic_link, $forum_link
+			);
+		}
+		else
+		{
+			// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
+			$edit_user_link = $this->generate_user_link($data['edit_user_id'], $data['edit_user_name']);
+			$message = sprintf('%s %s edited the the topic %s written by %s located in the forum %s',
+				$emoji, $edit_user_link, $topic_link, $user_link, $forum_link
+			);
+		}
+
+		// If an edit reason was given, add that information in the footer
+		$footer = null;
+		if (isset($data['edit_reason']) && $data['edit_reason'] !== '')
+		{
+			$preview_length = $this->notification_service->get_post_preview_length();
+			if ($preview_length > 0)
+			{
+				$footer = $data['edit_reason'];
+
+				// Truncate the preview if the edit reason is too long and add '...' for the last three characters.
+				// The length will always be at least 10 characters so we don't need to worry about really short strings.
+				if (strlen($footer) > $preview_length)
+				{
+					$footer = substr($footer, 0, $preview_length - 3) . '...';
+				}
+
+				// Prepend a little text to the footer so that it's clear what we're sharing
+				$footer = 'Reason: ' . $footer;
+			}
+		}
+
+		$this->notification_service->send_discord_notification($color, $message, $footer);
 	}
 
 	/**
@@ -778,9 +780,9 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Construct the notification message using the argument data
-		$user_link = generate_user_link($data['user_id'], $data['user_name']);
-		$forum_link = generate_forum_link($data['forum_id'], $data['forum_name']);
-		$topic_link = generate_topic_link($data['topic_id'], $data['topic_title']);
+		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
+		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
+		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
 		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
 		$message = sprintf('%s The topic titled %s in the %s forum started by user %s has been locked',
 			$emoji, $topic_link, $forum_link, $user_link
@@ -806,9 +808,9 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Construct the notification message using the argument data
-		$user_link = generate_user_link($data['user_id'], $data['user_name']);
-		$forum_link = generate_forum_link($data['forum_id'], $data['forum_name']);
-		$topic_link = generate_topic_link($data['topic_id'], $data['topic_title']);
+		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
+		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
+		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
 		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
 		$message = sprintf('%s The topic titled %s in the %s forum started by user %s has been unlocked',
 			$emoji, $topic_link, $forum_link, $user_link
@@ -836,7 +838,7 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Construct the notification message using the argument data.
-		$user_link = generate_user_link($data['user_id'], $data['user_name']);
+		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
 		$message = sprintf('%s New user account created for %s',
 			$emoji, $user_link
 		);
@@ -894,5 +896,92 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		$this->notification_service->send_discord_notification($color, $message);
+	}
+
+	// ------------------------------------------------------------------------
+	// --------------------------- Helper Functions ---------------------------
+	// ------------------------------------------------------------------------
+
+	/**
+	* The Discord webhook api does not accept urlencoded text. This function replaces problematic characters.
+	* @param $url
+	* @return Formatted URL text
+	*/
+	function reformat_link_url($url)
+	{
+		$url = str_replace(" ", "%20", $url);
+		$url = str_replace("(", "%28", $url);
+		$url = str_replace(")", "%29", $url);
+		return $url;
+	}
+
+	/**
+	* Discord link text must be surrounded by []. This function replaces problematic characters
+	* @param $text Text link
+	* @return Formatted link-safe text
+	*/
+	function reformat_link_text($text)
+	{
+		$text = str_replace("[", "(", $text);
+		$text = str_replace("]", ")", $text);
+		return $text;
+	}
+
+	/**
+	* Given the ID of a forum, returns text that contains a link to view the forum
+	* @param $topic_id The ID of the topic
+	* @param $post_id The ID of the post
+	* @param $text The text to display for the post link
+	* @return Text formatted in the notation that Discord would interpret.
+	*/
+	function generate_forum_link($forum_id, $text)
+	{
+		$url = generate_board_url() . '/viewforum.php?f=' . $forum_id;
+		$url = $this->reformat_link_url($url);
+		$text = $this->reformat_link_text($text);
+		return sprintf('[%s](%s)', $text, $url);
+	}
+
+	/**
+	* Given the ID of a valid post, returns text that contains the post title with a link to the post.
+	* @param $topic_id The ID of the topic
+	* @param $post_id The ID of the post
+	* @param $text The text to display for the post link
+	* @return Text formatted in the notation that Discord would interpret.
+	*/
+	function generate_post_link($topic_id, $post_id, $text)
+	{
+		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id . '#p' . $post_id;
+		$url = $this->reformat_link_url($url);
+		$text = $this->reformat_link_text($text);
+		return sprintf('[%s](%s)', $text, $url);
+	}
+
+	/**
+	* Given the ID of a valid topic, returns text that contains the topic title with a link to the topic.
+	* @param $topic_id The ID of the topic
+	* @param $text The text to display for the topic link
+	* @return Text formatted in the notation that Discord would interpret.
+	*/
+	function generate_topic_link($topic_id, $text)
+	{
+		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id;
+		$url = $this->reformat_link_url($url);
+		$text = $this->reformat_link_text($text);
+		return sprintf('[%s](%s)', $text, $url);
+	}
+
+	/**
+	* Given the ID of a valid user, returns text that contains the user name with a link to their user profile.
+	* @param $user_id The ID of the user
+	* @param $text The text to display for the user link
+	* @return Text formatted in the notation that Discord would interpret.
+	*/
+	function generate_user_link($user_id, $text)
+	{
+		$url = generate_board_url() . '/memberlist.php?mode=viewprofile&u=' . $user_id;
+		$url = $this->reformat_link_url($url);
+		$text = $this->reformat_link_text($text);
+		return sprintf('[%s](%s)', $text, $url);
 	}
 }
