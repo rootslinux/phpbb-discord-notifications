@@ -13,6 +13,7 @@ namespace roots\discordnotifications;
 /**
  * Contains the core logic for formatting and sending notification message to Discord.
  * This includes common utilities, such as verifying notification configuration settings
+ * and a few DB queries.
  */
 class notification_service
 {
@@ -91,6 +92,86 @@ class notification_service
 	}
 
 	/**
+	 * Retrieves the name of a forum from the database when given an ID
+	 * @param $forum_id The ID of the forum to query
+	 * @return The name of the forum, or NULL if not found
+	 */
+	public function get_forum_name($forum_id)
+	{
+		if (is_integer($forum_id) == false)
+		{
+			return null;
+		}
+
+		$sql = "SELECT forum_name from " . FORUMS_TABLE . " WHERE forum_id = $forum_id";
+		$result = $this->db->sql_query($sql);
+		$data = $this->db->sql_fetchrow($result);
+		$name = $data['forum_name'];
+		$this->db->sql_freeresult($result);
+		return $name;
+	}
+
+	/**
+	 * Retrieves the subject of a post from the database when given an ID
+	 * @param $post_id The ID of the post to query
+	 * @return The subject of the post, or NULL if not found
+	 */
+	public function get_post_subject($post_id)
+	{
+		if (is_integer($post_id) == false)
+		{
+			return null;
+		}
+
+		$sql = "SELECT post_subject from " . POSTS_TABLE . " WHERE post_id = $post_id";
+		$result = $this->db->sql_query($sql);
+		$data = $this->db->sql_fetchrow($result);
+		$subject = $data['post_subject'];
+		$this->db->sql_freeresult($result);
+		return $subject;
+	}
+
+	/**
+	 * Retrieves the title of a topic from the database when given an ID
+	 * @param $topic_id The ID of the topic to query
+	 * @return The name of the topic, or NULL if not found
+	 */
+	public function get_topic_title($topic_id)
+	{
+		if (is_integer($topic_id) == false)
+		{
+			return null;
+		}
+
+		$sql = "SELECT topic_title from " . TOPICS_TABLE . " WHERE topic_id = $topic_id";
+		$result = $this->db->sql_query($sql);
+		$data = $this->db->sql_fetchrow($result);
+		$title = $data['topic_title'];
+		$this->db->sql_freeresult($result);
+		return $title;
+	}
+
+	/**
+	 * Retrieves the name of a user from the database when given an ID
+	 * @param $user_id The ID of the user to query
+	 * @return The name of the user, or NULL if not found
+	 */
+	public function get_user_name($user_id)
+	{
+		if (is_integer($user_id) == false)
+		{
+			return null;
+		}
+
+		$sql = "SELECT username from " . USERS_TABLE . " WHERE user_id = $user_id";
+		$result = $this->db->sql_query($sql);
+		$data = $this->db->sql_fetchrow($result);
+		$name = $data['username'];
+		$this->db->sql_freeresult($result);
+		return $name;
+	}
+
+	/**
 	 * Sends a notification message to Discord. This function checks the master switch configuration for the extension, but does
 	 * no further checks. The caller is responsible for performing full validation of the notification prior to calling this function.
 	 * @param $color The color to use in the notification (decimal value of a hexadecimal RGB code)
@@ -107,7 +188,7 @@ class notification_service
 		// Note that the value stored in the config table will always be a valid URL when discord_notifications_enabled is set
 		$discord_webhook_url = $this->config['discord_notifications_webhook_url'];
 
-		$this->send_message($discord_webhook_url, $color, $message, $footer);
+		$this->execute_discord_webhook($discord_webhook_url, $color, $message, $footer);
 	}
 
 	/**
@@ -123,7 +204,7 @@ class notification_service
 			return;
 		}
 
-		$this->send_message($discord_webhook_url, self::DEFAULT_COLOR, $message, NULL);
+		$this->execute_discord_webhook($discord_webhook_url, self::DEFAULT_COLOR, $message, NULL);
 	}
 
 	/**
@@ -139,7 +220,7 @@ class notification_service
 	 * @return Boolean indicating whether the message transmission resulted in success or failure.
 	 * @see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
 	 */
-	private function send_message($discord_webhook_url, $color, $message, $footer = NULL)
+	private function execute_discord_webhook($discord_webhook_url, $color, $message, $footer = NULL)
 	{
 		if (isset($discord_webhook_url) == false || $discord_webhook_url === '')
 		{
