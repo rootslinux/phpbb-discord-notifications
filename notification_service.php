@@ -24,8 +24,8 @@ class notification_service
 	// Maximum number of characters allowed by Discord in a message footer.
 	const MAX_FOOTER_SIZE = 2048;
 
-	// The notification color to use as a default if a missing or invalid color value is received.
-	const DEFAULT_COLOR = 11777212; // Gray
+	// The notification color (gray) to use as a default if a missing or invalid color value is received.
+	const DEFAULT_COLOR = 11777212;
 
 	/** @var \phpbb\config\config */
 	protected $config;
@@ -37,6 +37,7 @@ class notification_service
 	 * Constructor
 	 *
 	 * @param \phpbb\config\config $config
+	 * @param \phpbb\db\driver\driver_interface $db
 	 */
 	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db)
 	{

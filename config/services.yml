@@ -11,6 +11,7 @@ services:
     roots.discordnotifications.listener:
         class: roots\discordnotifications\event\notification_event_listener
         arguments:
+            - '@language'
             - '@roots.discordnotifications.notification_service'
         tags:
             - { name: event.listener }
