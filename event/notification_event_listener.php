@@ -49,6 +49,9 @@ class notification_event_listener implements EventSubscriberInterface
 	const COLOR_BRIGHT_ORANGE	= 14050617;
 	const COLOR_BRIGHT_PURPLE	= 14038504;
 
+	/** @var \phpbb\language\language */
+	protected $language;
+
 	/** @var \roots\discordnotifications\notification_service */
 	protected $notification_service;
 
@@ -57,9 +60,13 @@ class notification_event_listener implements EventSubscriberInterface
 	 * @param \roots\discordnotifications\notification_service $notification_service
 	 * @access public
 	 */
-	public function __construct(\roots\discordnotifications\notification_service $notification_service)
+	public function __construct(\phpbb\language\language $language, \roots\discordnotifications\notification_service $notification_service)
 	{
+		$this->language = $language;
 		$this->notification_service = $notification_service;
+
+		// Add notifications text from langauge FILE_APPEND
+		$this->language->add_lang('discord_notification_messages', 'roots/discordnotifications');
 
 		// TODO: load data from cache
 	}
@@ -448,8 +455,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$post_link = $this->generate_post_link($data['topic_id'], $data['post_id'], 'post');
 		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
 		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
-		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
-		$message = sprintf('%s %s created a new %s in the topic %s located in the forum %s',
+		$message = sprintf($this->language->lang('CREATE_POST'),
 			$emoji, $user_link, $post_link, $topic_link, $forum_link
 		);
 
@@ -458,8 +464,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$preview_length = $this->notification_service->get_post_preview_length();
 		if ($preview_length > 0)
 		{
-			// TODO: figure out how to remove the tags/styling from the post text.
-			$footer = $data['content'];
+			$footer = $this->remove_formatting($data['content']);
 
 			// Truncate the preview if the post content is too long and add '...' for the last three characters.
 			// The length will always be at least 10 characters so we don't need to worry about really short strings.
@@ -469,7 +474,7 @@ class notification_event_listener implements EventSubscriberInterface
 			}
 
 			// Prepend a little text to the footer so it's clear that we're sharing the post content
-			$footer = 'Preview: ' . $footer;
+			$footer = $this->language->lang('PREVIEW') . $footer;
 		}
 
 		$this->notification_service->send_discord_notification($color, $message, $footer);
@@ -501,38 +506,34 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = '';
 		if ($data['user_id'] == $data['edit_user_id'])
 		{
-			$message = sprintf('%s %s edited their %s in the topic %s located in the forum %s',
+			$message = sprintf($this->language->lang('UPDATE_POST_SELF'),
 				$emoji, $user_link, $post_link, $topic_link, $forum_link
 			);
 		}
 		else
 		{
-			// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
 			$edit_user_link = $this->generate_user_link($data['edit_user_id'], $data['edit_user_name']);
-			$message = sprintf('%s %s edited the %s written by %s in the topic %s located in the forum %s',
+			$message = sprintf($this->language->lang('UPDATE_POST_OTHER'),
 				$emoji, $edit_user_link, $post_link, $user_link, $topic_link, $forum_link
 			);
 		}
 
-		// If an edit reason was given, add that information in the footer
+		// If we allow previews and an edit reason was given, add that information in the footer
 		$footer = null;
-		if (isset($data['edit_reason']) && $data['edit_reason'] !== '')
+		$preview_length = $this->notification_service->get_post_preview_length();
+		if ($preview_length > 0 && isset($data['edit_reason']) && $data['edit_reason'] !== '')
 		{
-			$preview_length = $this->notification_service->get_post_preview_length();
-			if ($preview_length > 0)
+			$footer = $this->remove_formatting($data['edit_reason']);
+
+			// Truncate the preview if the edit reason is too long and add '...' for the last three characters.
+			// The length will always be at least 10 characters so we don't need to worry about really short strings.
+			if (strlen($footer) > $preview_length)
 			{
-				$footer = $data['edit_reason'];
-
-				// Truncate the preview if the edit reason is too long and add '...' for the last three characters.
-				// The length will always be at least 10 characters so we don't need to worry about really short strings.
-				if (strlen($footer) > $preview_length)
-				{
-					$footer = substr($footer, 0, $preview_length - 3) . '...';
-				}
-
-				// Prepend a little text to the footer so that it's clear what we're sharing
-				$footer = 'Reason: ' . $footer;
+				$footer = substr($footer, 0, $preview_length - 3) . '...';
 			}
+
+			// Prepend a little text to the footer so that it's clear what we're sharing
+			$footer = $this->language->lang('REASON') . $footer;
 		}
 
 		$this->notification_service->send_discord_notification($color, $message, $footer);
@@ -562,24 +563,24 @@ class notification_event_listener implements EventSubscriberInterface
 		$forum_name = $data['forum_name'] !== '' ? $data['forum_name'] : '{forum}';
 		$forum_link = $this->generate_forum_link($data['forum_id'], $forum_name);
 
-		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
-		$message = sprintf('%s Deleted post by user %s in the topic %s located in the forum %s',
+		$message = sprintf($this->language->lang('DELETE_POST'),
 			$emoji, $user_link, $topic_link, $forum_link
 		);
 
 		// If there was a reason specified for the delete, include that in the message footer if previews are enabled
-		$footer = $data['delete_reason'];
-		if (is_string($footer) && $footer !== '')
+		$footer = null;
+		$preview_length = $this->notification_service->get_post_preview_length();
+		if ($preview_length > 0 && is_string($data['delete_reason']) && $data['delete_reason'] !== '')
 		{
-			$preview_length = $this->notification_service->get_post_preview_length();
-			if ($preview_length > 0)
+			$footer = $this->remove_formatting($data['delete_reason']);
+
+			// Truncate the delete reason if it is too long and add '...' for the last three characters. The length
+			// will always be at least 10 characters so we don't need to worry about really short strings.
+			if (strlen($footer) > $preview_length)
 			{
-				if (strlen($footer) > $preview_length)
-				{
-					$footer = substr($footer, 0, $preview_length - 3) . '...';
-				}
+				$footer = substr($footer, 0, $preview_length - 3) . '...';
 			}
-			$footer = 'Reason: ' . $footer;
+			$footer = $this->language->lang('REASON') . $footer;
 		}
 
 		$this->notification_service->send_discord_notification($color, $message, $footer);
@@ -651,8 +652,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
 		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
 		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
-		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
-		$message = sprintf('%s %s created a new topic titled %s in the %s forum',
+		$message = sprintf($this->language->lang('CREATE_TOPIC'),
 			$emoji, $user_link, $topic_link, $forum_link
 		);
 
@@ -661,8 +661,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$preview_length = $this->notification_service->get_post_preview_length();
 		if ($preview_length > 0)
 		{
-			// TODO: figure out how to remove the tags/styling from the post text.
-			$footer = $data['content'];
+			$footer = $this->remove_formatting($data['content']);
 
 			// Truncate the preview if the topic content is too long and add '...' for the last three characters.
 			// The length will always be at least 10 characters so we don't need to worry about really short strings.
@@ -672,7 +671,7 @@ class notification_event_listener implements EventSubscriberInterface
 			}
 
 			// Prepend a little text to the footer so it's clear that we're sharing the topic content
-			$footer = 'Preview: ' . $footer;
+			$footer = $this->language->lang('PREVIEW') . $footer;
 		}
 
 		$this->notification_service->send_discord_notification($color, $message, $footer);
@@ -703,38 +702,34 @@ class notification_event_listener implements EventSubscriberInterface
 		$message = '';
 		if ($data['user_id'] == $data['edit_user_id'])
 		{
-			$message = sprintf('%s %s edited their topic %s located in the forum %s',
+			$message = sprintf($this->language->lang('UPDATE_TOPIC_SELF'),
 				$emoji, $user_link, $topic_link, $forum_link
 			);
 		}
 		else
 		{
-			// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
 			$edit_user_link = $this->generate_user_link($data['edit_user_id'], $data['edit_user_name']);
-			$message = sprintf('%s %s edited the the topic %s written by %s located in the forum %s',
+			$message = sprintf($this->language->lang('UPDATE_TOPIC_OTHER'),
 				$emoji, $edit_user_link, $topic_link, $user_link, $forum_link
 			);
 		}
 
-		// If an edit reason was given, add that information in the footer
+		// If previews are enabled and an edit reason was given, add that information in the footer
 		$footer = null;
-		if (isset($data['edit_reason']) && $data['edit_reason'] !== '')
+		$preview_length = $this->notification_service->get_post_preview_length();
+		if ($preview_length > 0 && isset($data['edit_reason']) && $data['edit_reason'] !== '')
 		{
-			$preview_length = $this->notification_service->get_post_preview_length();
-			if ($preview_length > 0)
+			$footer = $this->remove_formatting($data['edit_reason']);
+
+			// Truncate the preview if the edit reason is too long and add '...' for the last three characters.
+			// The length will always be at least 10 characters so we don't need to worry about really short strings.
+			if (strlen($footer) > $preview_length)
 			{
-				$footer = $data['edit_reason'];
-
-				// Truncate the preview if the edit reason is too long and add '...' for the last three characters.
-				// The length will always be at least 10 characters so we don't need to worry about really short strings.
-				if (strlen($footer) > $preview_length)
-				{
-					$footer = substr($footer, 0, $preview_length - 3) . '...';
-				}
-
-				// Prepend a little text to the footer so that it's clear what we're sharing
-				$footer = 'Reason: ' . $footer;
+				$footer = substr($footer, 0, $preview_length - 3) . '...';
 			}
+
+			// Prepend a little text to the footer so that it's clear what we're sharing
+			$footer = $this->language->lang('REASON') . $footer;
 		}
 
 		$this->notification_service->send_discord_notification($color, $message, $footer);
@@ -783,8 +778,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
 		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
 		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
-		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
-		$message = sprintf('%s The topic titled %s in the %s forum started by user %s has been locked',
+		$message = sprintf($this->language->lang('LOCK_TOPIC'),
 			$emoji, $topic_link, $forum_link, $user_link
 		);
 
@@ -811,8 +805,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
 		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
 		$topic_link = $this->generate_topic_link($data['topic_id'], $data['topic_title']);
-		// TODO: Put this text in language/ and figure out how to reorder parameters dynamically
-		$message = sprintf('%s The topic titled %s in the %s forum started by user %s has been unlocked',
+		$message = sprintf($this->language->lang('UNLOCK_TOPIC'),
 			$emoji, $topic_link, $forum_link, $user_link
 		);
 
@@ -839,7 +832,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 		// Construct the notification message using the argument data.
 		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
-		$message = sprintf('%s New user account created for %s',
+		$message = sprintf($this->language->lang('CREATE_USER'),
 			$emoji, $user_link
 		);
 
@@ -870,27 +863,38 @@ class notification_event_listener implements EventSubscriberInterface
 		if (count($data) == 1)
 		{
 			$user_name = array_pop($data);
-			$message = sprintf('%s Deleted account for user %s',
+			$message = sprintf($this->language->lang('DELETE_USER'),
 				$emoji, $user_name
 			);
 		}
 		else {
 			$deleted_users_text = '';
+			$and = $this->language->lang('AND');
+			$comma = $this->language->lang('CONJ');
 			if (count($data) == 2)
 			{
-				$deleted_users_text = array_pop($data) . ' and ' . array_pop($data);
+				$deleted_users_text = array_pop($data) . " $and " . array_pop($data);
 			}
 			elseif (count($data) == 3)
 			{
-				$deleted_users_text = array_pop($data) . ', ' . array_pop($data) . ', and ' . array_pop($data);
+				$deleted_users_text = array_pop($data) . "$comma " . array_pop($data) . "$comma $and " . array_pop($data);
 			}
 			// If more than three users were deleted, we display three user names and then the number of additional deletions
 			elseif (count($data) > 3)
 			{
-				$deleted_users_text = array_pop($data) . ', ' . array_pop($data) . ', ' . array_pop($data) . ', ' . 'and ' . count($data) . ' others';
+				$deleted_users_text = array_pop($data) . "$comma " . array_pop($data) . "$comma " . array_pop($data) . "$comma $and " . count($data);
+				// Singular vs plural case check
+				if (count($data) == 1)
+				{
+					$deleted_users_text .= " " . $this->language->lang('OTHER');
+				}
+				else
+				{
+					$deleted_users_text .= " " . $this->language->lang('OTHERS');
+				}
 			}
 
-			$message = sprintf('%s Deleted accounts for users %s',
+			$message = sprintf($this->language->lang('DELETE_MULTI_USER'),
 				$emoji, $deleted_users_text
 			);
 		}
@@ -907,7 +911,7 @@ class notification_event_listener implements EventSubscriberInterface
 	* @param $url
 	* @return Formatted URL text
 	*/
-	function reformat_link_url($url)
+	private function reformat_link_url($url)
 	{
 		$url = str_replace(" ", "%20", $url);
 		$url = str_replace("(", "%28", $url);
@@ -920,10 +924,25 @@ class notification_event_listener implements EventSubscriberInterface
 	* @param $text Text link
 	* @return Formatted link-safe text
 	*/
-	function reformat_link_text($text)
+	private function reformat_link_text($text)
 	{
 		$text = str_replace("[", "(", $text);
 		$text = str_replace("]", ")", $text);
+		return $text;
+	}
+
+	/**
+	* Removes all HTML and BBcode formatting tags from a string
+	* @param $text Text link
+	* @return Formatted text
+	*
+	* Note that there is some risk here of the text not coming out exactly as we may like. The user text
+	* may include characters that look like pseudo-HTML and get picked up by the regex used.
+	*/
+	private function remove_formatting($text)
+	{
+		$text = strip_tags($text);
+		$text = preg_replace('|[[\/\!]*?[^\[\]]*?]|si', '', $text);
 		return $text;
 	}
 
@@ -934,7 +953,7 @@ class notification_event_listener implements EventSubscriberInterface
 	* @param $text The text to display for the post link
 	* @return Text formatted in the notation that Discord would interpret.
 	*/
-	function generate_forum_link($forum_id, $text)
+	private function generate_forum_link($forum_id, $text)
 	{
 		$url = generate_board_url() . '/viewforum.php?f=' . $forum_id;
 		$url = $this->reformat_link_url($url);
@@ -949,7 +968,7 @@ class notification_event_listener implements EventSubscriberInterface
 	* @param $text The text to display for the post link
 	* @return Text formatted in the notation that Discord would interpret.
 	*/
-	function generate_post_link($topic_id, $post_id, $text)
+	private function generate_post_link($topic_id, $post_id, $text)
 	{
 		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id . '#p' . $post_id;
 		$url = $this->reformat_link_url($url);
@@ -963,7 +982,7 @@ class notification_event_listener implements EventSubscriberInterface
 	* @param $text The text to display for the topic link
 	* @return Text formatted in the notation that Discord would interpret.
 	*/
-	function generate_topic_link($topic_id, $text)
+	private function generate_topic_link($topic_id, $text)
 	{
 		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id;
 		$url = $this->reformat_link_url($url);
@@ -977,7 +996,7 @@ class notification_event_listener implements EventSubscriberInterface
 	* @param $text The text to display for the user link
 	* @return Text formatted in the notation that Discord would interpret.
 	*/
-	function generate_user_link($user_id, $text)
+	private function generate_user_link($user_id, $text)
 	{
 		$url = generate_board_url() . '/memberlist.php?mode=viewprofile&u=' . $user_id;
 		$url = $this->reformat_link_url($url);
