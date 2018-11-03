@@ -34,7 +34,7 @@ $lang = array_merge($lang, array(
 	'CREATE_TOPIC'				=> '%s %s created a new topic titled %s in the %s forum', // %s == emoji, user, topic, forum
 	'UPDATE_TOPIC_SELF'			=> '%s %s edited their topic %s located in the forum %s', // %s == emoji, user, topic, forum
 	'UPDATE_TOPIC_OTHER'		=> '%s %s edited the the topic %s written by %s located in the forum %s', // %s == emoji, edit user, topic, user, forum
-	'DELETE_TOPIC'				=> '', // TODO
+	'DELETE_TOPIC'				=> '%s Deleted the topic started by user %s titled \'%s\' containing %d posts in the forum %s', // %s/d == emoji, user, topic title, post count, forum
 	'LOCK_TOPIC'				=> '%s The topic titled %s in the %s forum started by user %s has been locked', // %s == emoji, topic, forum, user
 	'UNLOCK_TOPIC'				=> '%s The topic titled %s in the %s forum started by user %s has been unlocked', // %s == emoji, topic, forum, user
 

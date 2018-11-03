@@ -97,7 +97,7 @@ class notification_service
 	 * @param $forum_id The ID of the forum to query
 	 * @return The name of the forum, or NULL if not found
 	 */
-	public function get_forum_name($forum_id)
+	public function query_forum_name($forum_id)
 	{
 		if (is_integer($forum_id) == false)
 		{
@@ -117,7 +117,7 @@ class notification_service
 	 * @param $post_id The ID of the post to query
 	 * @return The subject of the post, or NULL if not found
 	 */
-	public function get_post_subject($post_id)
+	public function query_post_subject($post_id)
 	{
 		if (is_integer($post_id) == false)
 		{
@@ -137,7 +137,7 @@ class notification_service
 	 * @param $topic_id The ID of the topic to query
 	 * @return The name of the topic, or NULL if not found
 	 */
-	public function get_topic_title($topic_id)
+	public function query_topic_title($topic_id)
 	{
 		if (is_integer($topic_id) == false)
 		{
@@ -153,11 +153,41 @@ class notification_service
 	}
 
 	/**
+	* Runs a query to fetch useful data about a specific forum topic. The return data includes information on the first poster, number of posts,
+	* which forum contains the topic, and more.
+	* @param $user_id The ID of the user
+	* @param $text The text to display for the user link
+	* @return Array containing data about the topic and the forum it is contained in
+	*/
+	public function query_topic_details($topic_id)
+	{
+		if (is_integer($topic_id) == false)
+		{
+			return array();
+		}
+
+		$topic_table = TOPICS_TABLE;
+		$forum_table = FORUMS_TABLE;
+		$sql = "SELECT
+				f.forum_id, f.forum_name,
+				t.topic_id, t.topic_title, t.topic_poster, t.topic_first_post_id, t.topic_first_poster_name, t.topic_posts_approved, t.topic_visibility
+				FROM
+				$forum_table f, $topic_table t
+				WHERE
+				t.forum_id = f.forum_id and t.topic_id = $topic_id";
+		$result = $this->db->sql_query($sql);
+		$data = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+
+		return $data;
+	}
+
+	/**
 	 * Retrieves the name of a user from the database when given an ID
 	 * @param $user_id The ID of the user to query
 	 * @return The name of the user, or NULL if not found
 	 */
-	public function get_user_name($user_id)
+	public function query_user_name($user_id)
 	{
 		if (is_integer($user_id) == false)
 		{
