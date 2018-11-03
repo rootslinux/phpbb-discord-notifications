@@ -27,8 +27,8 @@ $lang = array_merge($lang, array(
 	'UPDATE_POST_SELF'			=> '%s %s edited their %s in the topic %s located in the forum %s', // %s == emoji, user, post, topic, forum
 	'UPDATE_POST_OTHER'			=> '%s %s edited the %s written by %s in the topic %s located in the forum %s', // %s == emoji, edit user, post, user, topic, forum
 	'DELETE_POST'				=> '%s Deleted post by user %s in the topic %s located in the forum %s', // %s == emoji, user, topic, forum
-	'LOCK_POST'					=> '', // TODO
-	'UNLOCK_POST'				=> '', // TODO
+	'LOCK_POST'					=> '%s The %s written by user %s in the topic titled %s in the %s forum has been locked', // %s == emoji, post, user, topic, forum
+	'UNLOCK_POST'				=> '%s The %s written by user %s in the topic titled %s in the %s forum has been unlocked', // %s == emoji, post, user, topic, forum
 
 	// Topic Notifications
 	'CREATE_TOPIC'				=> '%s %s created a new topic titled %s in the %s forum', // %s == emoji, user, topic, forum
