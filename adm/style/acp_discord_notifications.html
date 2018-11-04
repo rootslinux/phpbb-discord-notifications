@@ -28,8 +28,12 @@
 		<dl>
 			<dt><label for="dn_test_message">{L_DN_TEST_MESSAGE}{L_COLON}</label><br /><span>{L_DN_TEST_DESCRIPTION}</span></dt>
 			<dd>
-				<input name="dn_text_message" type="text" value="{{ DN_TEST_MESSAGE_TEXT }}" size="100" maxlength="255" />
+				<input name="dn_test_message" type="text" value="{{ DN_TEST_MESSAGE_TEXT }}" size="100" maxlength="255" />
 			</dd>
+		</dl>
+		<dl>
+			<dt><label for="action_send_test_message">{L_DN_SEND_TEST}{L_COLON}</label><br /><span>{L_DN_SEND_TEST_DESCRIPTION}</span></dt>
+			<dd><input class="button2" type="submit" id="action_send_test_message" name="action_send_test_message" value="{{ lang('DN_SEND_TEST') }}" /></dd>
 		</dl>
 	</fieldset>
 

@@ -72,6 +72,8 @@ class discord_notifications_module
 		$this->request = $phpbb_container->get('request');
 		$this->template = $phpbb_container->get('template');
 		$this->user = $phpbb_container->get('user');
+		// \roots\discordnotifications\notification_service -- Used for sending test messages to Discord
+		$this->notification_service = $phpbb_container->get('roots.discordnotifications.notification_service');
 
 		$this->user->add_lang_ext('roots/discordnotifications', 'acp_discord_notifications');
 		$this->tpl_name = 'acp_discord_notifications';
@@ -79,8 +81,12 @@ class discord_notifications_module
 
 		add_form_key(self::PAGE_FORM_NAME);
 
-		// Process form submission if present
-		if ($this->request->is_set_post('submit'))
+		// Process submit actions
+		if ($this->request->is_set_post('action_send_test_message'))
+		{
+			$this->process_send_test_message();
+		}
+		elseif ($this->request->is_set_post('submit'))
 		{
 			$this->process_form_submit();
 		}
@@ -114,6 +120,36 @@ class discord_notifications_module
 
 			'U_ACTION'					=> $this->u_action,
 		));
+	}
+
+	/*
+	 * Called when the user clicks the "Send Test Message" button on the page. Sends the content in the
+	 * Text Message input to Discord.
+	 */
+	private function process_send_test_message()
+	{
+		$webhook_url = $this->request->variable('dn_webhook_url', '');
+		$test_message = $this->request->variable('dn_test_message', '');
+
+		// Check user inputs before attempting to send the message
+		if ($test_message == '')
+		{
+			trigger_error($this->user->lang('DN_TEST_BAD_MESSAGE') . adm_back_link($this->u_action), E_USER_WARNING);
+		}
+		if ($webhook_url == '' || !filter_var($webhook_url, FILTER_VALIDATE_URL))
+		{
+			trigger_error($this->user->lang('DN_TEST_BAD_WEBHOOK') . adm_back_link($this->u_action), E_USER_WARNING);
+		}
+
+		$result = $this->notification_service->force_send_discord_notification($webhook_url, $test_message);
+		if ($result == true)
+		{
+			trigger_error($this->user->lang('DN_TEST_SUCCESS') . adm_back_link($this->u_action));
+		}
+		else
+		{
+			trigger_error($this->user->lang('DN_TEST_FAILURE') . adm_back_link($this->u_action), E_USER_WARNING);
+		}
 	}
 
 	/*

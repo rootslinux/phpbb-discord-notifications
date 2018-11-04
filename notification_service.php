@@ -227,15 +227,16 @@ class notification_service
 	 * to test their notifications from the ACP.
 	 * @param $discord_webhook_url The URL of the Discord webhook to transmit the message to. If this is an invalid URL, no message will be sent.
 	 * @param $message The message text to send. Must be a non-empty string.
+	 * @return Boolean indicating whether the message transmission resulted in success or failure.
 	 */
 	public function force_send_discord_notification($discord_webhook_url, $message)
 	{
 		if (!filter_var($discord_webhook_url, FILTER_VALIDATE_URL) || is_string($message) == false)
 		{
-			return;
+			return false;
 		}
 
-		$this->execute_discord_webhook($discord_webhook_url, self::DEFAULT_COLOR, $message, NULL);
+		return $this->execute_discord_webhook($discord_webhook_url, self::DEFAULT_COLOR, $message, NULL);
 	}
 
 	/**
