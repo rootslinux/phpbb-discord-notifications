@@ -4,6 +4,8 @@
  *
  * @copyright (c) 2018, Tyler Olsen, https://github.com/rootslinux
  * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ * This file contains the language strings for the notification messages that are transmitted to Discord.
  */
 
 if (!defined('IN_PHPBB'))
@@ -51,4 +53,7 @@ $lang = array_merge($lang, array(
 	'CONJ'						=> ',', // short for "conjunction character"
 	'OTHER'						=> 'other',
 	'OTHERS'					=> 'others',
+	'UNKNOWN_USER'				=> '{user}',
+	'UNKNOWN_FORUM'				=> '{forum}',
+	'UNKNOWN_TOPIC'				=> '{topic}',
 ));

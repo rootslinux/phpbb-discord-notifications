@@ -1,11 +1,9 @@
 <?php
 /**
- *
  * Discord Notifications. An extension for the phpBB Forum Software package.
  *
  * @copyright (c) 2018, Tyler Olsen, https://github.com/rootslinux
  * @license GNU General Public License, version 2 (GPL-2.0)
- *
  */
 
 namespace roots\discordnotifications;
@@ -155,8 +153,7 @@ class notification_service
 	/**
 	* Runs a query to fetch useful data about a specific forum topic. The return data includes information on the first poster, number of posts,
 	* which forum contains the topic, and more.
-	* @param $user_id The ID of the user
-	* @param $text The text to display for the user link
+	* @param $topic_id The ID of the topic to query
 	* @return Array containing data about the topic and the forum it is contained in
 	*/
 	public function query_topic_details($topic_id)
@@ -223,7 +220,7 @@ class notification_service
 	}
 
 	/**
-	 * Sends a basic message to Discord, disregarding any configurations that are currently set. This method is primarily used by users
+	 * Sends a message to Discord, disregarding any configurations that are currently set. This method is primarily used by users
 	 * to test their notifications from the ACP.
 	 * @param $discord_webhook_url The URL of the Discord webhook to transmit the message to. If this is an invalid URL, no message will be sent.
 	 * @param $message The message text to send. Must be a non-empty string.
@@ -231,7 +228,7 @@ class notification_service
 	 */
 	public function force_send_discord_notification($discord_webhook_url, $message)
 	{
-		if (!filter_var($discord_webhook_url, FILTER_VALIDATE_URL) || is_string($message) == false)
+		if (!filter_var($discord_webhook_url, FILTER_VALIDATE_URL) || is_string($message) == false || $message == '')
 		{
 			return false;
 		}
@@ -263,24 +260,23 @@ class notification_service
 			// Use the default color if we did not receive a valid color value
 			$color = self::DEFAULT_COLOR;
 		}
-		if (is_string($message) == false)
+		if (is_string($message) == false || $message == '')
 		{
 			return false;
 		}
-		if (isset($footer) == true && is_string($footer) == false)
+		if (isset($footer) == true && (is_string($footer) == false || $footer == ''))
 		{
 			return false;
 		}
 
 		// Clean up the message and footer text before sending by trimming whitespace from the front and end of the message and footer strings.
-		// TODO: newline characters actually should work...
+		// TODO: newline characters break when used in sprintf() to construct the message, but there should be a way to get them to work
 		$message = trim($message);
 		$message = str_replace('"', "'", $message); // Replace " characters that would break the JSON encoding that our message must be wrapped in.
 		$message = str_replace(array("\r", "\n"), ' ', $message); // Newline characters will break messages as well
 		if (isset($footer))
 		{
 			$footer = trim($footer);
-			$footer = str_replace('"', "'", $footer);
 			$footer = str_replace('"', "'", $footer);
 			$footer = str_replace(array("\r", "\n"), ' ', $footer);
 		}
@@ -330,7 +326,7 @@ class notification_service
 		// Check if the response was not successful
 		if (is_array($response) && $response['message'])
 		{
-			// TODO: if the response includes a message then an error has occurred. Determine whether we want to log it, queue it up to try again, etc.
+			// TODO: If the response includes a message then an error has occurred. Determine whether we want to log it, queue it up to try again, etc.
 			return false;
 		}
 

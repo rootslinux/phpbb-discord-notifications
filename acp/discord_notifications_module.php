@@ -52,6 +52,9 @@ class discord_notifications_module
 	/** @var \phpbb\log\log */
 	protected $log;
 
+	/** @var \roots\discordnotifications\notification_service */
+	protected $notification_service;
+
 	/** @var \phpbb\request\request */
 	protected $request;
 
@@ -72,7 +75,7 @@ class discord_notifications_module
 		$this->request = $phpbb_container->get('request');
 		$this->template = $phpbb_container->get('template');
 		$this->user = $phpbb_container->get('user');
-		// \roots\discordnotifications\notification_service -- Used for sending test messages to Discord
+		// Used for sending test messages to Discord
 		$this->notification_service = $phpbb_container->get('roots.discordnotifications.notification_service');
 
 		$this->user->add_lang_ext('roots/discordnotifications', 'acp_discord_notifications');
@@ -91,7 +94,7 @@ class discord_notifications_module
 			$this->process_form_submit();
 		}
 
-		// Generate some of the dynamic page HTML content
+		// Generate the dynamic HTML content for enabling/disabling forum notifications
 		$forum_section_html = $this->generate_forum_section();
 
 		// Assign template values so that the page reflects the state of the extension settings
@@ -183,7 +186,7 @@ class discord_notifications_module
 			trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 		$preview_length = (int)$preview_length;
-		if (($preview_length < self::MIN_POST_PREVIEW_LENGTH || $preview_length > self::MAX_POST_PREVIEW_LENGTH) && $preview_length != 0)
+		if ($preview_length != 0 && ($preview_length < self::MIN_POST_PREVIEW_LENGTH || $preview_length > self::MAX_POST_PREVIEW_LENGTH))
 		{
 			trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
