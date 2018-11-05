@@ -270,14 +270,14 @@ class notification_service
 		}
 
 		// Clean up the message and footer text before sending by trimming whitespace from the front and end of the message and footer strings.
-		// TODO: newline characters break when used in sprintf() to construct the message, but there should be a way to get them to work
 		$message = trim($message);
 		$message = str_replace('"', "'", $message); // Replace " characters that would break the JSON encoding that our message must be wrapped in.
-		$message = str_replace(array("\r", "\n"), ' ', $message); // Newline characters will break messages as well
 		if (isset($footer))
 		{
 			$footer = trim($footer);
 			$footer = str_replace('"', "'", $footer);
+			// Discord does not appear to allow newline characters in the footer. In fact, the presence of them causes the message POST
+			// to fail. Hence why we replace all newlines with a space here.
 			$footer = str_replace(array("\r", "\n"), ' ', $footer);
 		}
 
