@@ -367,7 +367,7 @@ class notification_event_listener implements EventSubscriberInterface
 		{
 			$user_data['user_id'] = array_pop($event['user_id_ary']);
 			$user_name = $this->notification_service->query_user_name($user_data['user_id']);
-			$post_data['user_name'] = ($user_name != null) ? $user_name : $this->language->lang('UNKNOWN_USER');
+			$user_data['user_name'] = ($user_name != null) ? $user_name : $this->language->lang('UNKNOWN_USER');
 		}
 		// Ignore deactivated user case
 		else
