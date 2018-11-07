@@ -66,6 +66,11 @@ class notification_service
 	 */
 	public function is_notification_forum_enabled($forum_id)
 	{
+		if (is_numeric($forum_id) == false)
+		{
+			return false;
+		}
+
 		if ($this->config['discord_notifications_enabled'] == 0)
 		{
 			return false;
@@ -97,7 +102,7 @@ class notification_service
 	 */
 	public function query_forum_name($forum_id)
 	{
-		if (is_integer($forum_id) == false)
+		if (is_numeric($forum_id) == false)
 		{
 			return null;
 		}
@@ -117,7 +122,7 @@ class notification_service
 	 */
 	public function query_post_subject($post_id)
 	{
-		if (is_integer($post_id) == false)
+		if (is_numeric($post_id) == false)
 		{
 			return null;
 		}
@@ -137,7 +142,7 @@ class notification_service
 	 */
 	public function query_topic_title($topic_id)
 	{
-		if (is_integer($topic_id) == false)
+		if (is_numeric($topic_id) == false)
 		{
 			return null;
 		}
@@ -158,7 +163,7 @@ class notification_service
 	*/
 	public function query_topic_details($topic_id)
 	{
-		if (is_integer($topic_id) == false)
+		if (is_numeric($topic_id) == false)
 		{
 			return array();
 		}
@@ -186,7 +191,7 @@ class notification_service
 	 */
 	public function query_user_name($user_id)
 	{
-		if (is_integer($user_id) == false)
+		if (is_numeric($user_id) == false)
 		{
 			return null;
 		}
