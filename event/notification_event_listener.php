@@ -295,7 +295,7 @@ class notification_event_listener implements EventSubscriberInterface
 		// Two sets of user data captured: one for the post (if applicable) and one for the user that started the topic
 		$lock_data['post_user_id'] = $event['data'][$id]['poster_id'];
 		$lock_data['post_user_name'] = $event['data'][$id]['username'];
-		$lock_data['topic_user_id'] = $event['data'][$id]['topic_first_poster_id'];
+		$lock_data['topic_user_id'] = $event['data'][$id]['topic_poster'];
 		$lock_data['topic_user_name'] = $event['data'][$id]['topic_first_poster_name'];
 
 		// If the forum the post was made in does not have notifications enabled or the topic/poar is not visible, do nothing more.
