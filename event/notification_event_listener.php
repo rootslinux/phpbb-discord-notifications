@@ -886,7 +886,7 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function generate_post_link($topic_id, $post_id, $text)
 	{
-		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id . '#p' . $post_id;
+		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id . '&amp;p=' . $post_id . '#p' . $post_id;
 		$url = $this->reformat_link_url($url);
 		$text = $this->reformat_link_text($text);
 		return sprintf('[%s](%s)', $text, $url);
