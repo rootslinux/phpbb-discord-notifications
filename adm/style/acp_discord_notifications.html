@@ -105,7 +105,25 @@
 	<fieldset>
 		<legend>{L_DN_FORUM_SETTINGS}</legend>
 		<p>{L_DN_FORUM_DESCRIPTION}</p>
-		{{ DN_FORUM_SECTION }}
+		<!-- IF .forumrow -->
+			<!-- BEGIN forumrow -->
+				<!-- IF forumrow.S_IS_CAT -->
+					<dl>
+						<dt><label><u>{forumrow.FORUM_NAME}</u></label></dt>
+					</dl>
+				<!-- ELSE -->
+					<dl>
+						<dt><label for="{forumrow.FORUM_ID}">{forumrow.FORUM_NAME}{L_COLON}</label></dt>
+						<dd>
+							<label><input type="radio" class="radio" name="{forumrow.FORUM_ID}" value="1" <!-- IF forumrow.FORUM_DN_ENABLED -->checked="checked"<!-- ENDIF --> />{L_YES}</label>
+							<label><input type="radio" class="radio" name="{forumrow.FORUM_ID}" value="0" <!-- IF not forumrow.FORUM_DN_ENABLED -->checked="checked"<!-- ENDIF --> />{L_NO}</label>
+						</dd>
+					</dl>
+				<!-- ENDIF -->
+			<!-- BEGINELSE -->
+					<strong>{L_NO_FORUMS}</strong>
+			<!-- END forumrow -->
+		<!-- ENDIF -->
 	</fieldset>
 
 	<fieldset class="submit-buttons">

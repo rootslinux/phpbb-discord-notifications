@@ -95,7 +95,7 @@ class discord_notifications_module
 		}
 
 		// Generate the dynamic HTML content for enabling/disabling forum notifications
-		$forum_section_html = $this->generate_forum_section();
+		$this->generate_forum_section();
 
 		// Assign template values so that the page reflects the state of the extension settings
 		$this->template->assign_vars(array(
@@ -118,8 +118,6 @@ class discord_notifications_module
 
 			'DN_USER_CREATE'			=> $this->config['discord_notification_type_user_create'],
 			'DN_USER_DELETE'			=> $this->config['discord_notification_type_user_delete'],
-
-			'DN_FORUM_SECTION'			=> $forum_section_html,
 
 			'U_ACTION'					=> $this->u_action,
 		));
@@ -245,49 +243,37 @@ class discord_notifications_module
 	/**
 	 * Generates the section of the ACP page listing all of the forums, in order, with the radio button option
 	 * that allows the user to enable or disable discord notifications for that forum.
-	 *
-	 * @return HTML to render for the forum section
 	 */
 	private function generate_forum_section()
 	{
-		// Grab the raw language values to insert here. We must do this because if we used {L_YES} or another label in the HTML text,
-		// it will not get interpretted like it otherwise would if it was static content in the .html file.
-		$colon = $this->language->lang_raw('COLON');
-		$yes = $this->language->lang_raw('YES');
-		$no = $this->language->lang_raw('NO');
-
 		$sql = "SELECT forum_id, forum_type, forum_name, discord_notifications_enabled FROM " . FORUMS_TABLE . " ORDER BY left_id ASC";
 		$result = $this->db->sql_query($sql);
 
-		$html = '';
 		while ($row = $this->db->sql_fetchrow($result))
 		{
 			// Category forums are displayed for organizational purposes, but have no configuration
 			if ($row['forum_type'] == FORUM_CAT)
 			{
-				$html .= "<dl>\n"
-					. "<dt><label><u>" . $row['forum_name'] . "</u></label></dt>\n"
-					. "</dl>\n";
+				$tpl_row = array(
+					'S_IS_CAT'		=> true,
+					'FORUM_NAME'	=> $row['forum_name'],
+				);
+				$this->template->assign_block_vars('forumrow', $tpl_row);
 			}
-			// Normal forums have a radio input with the value selected basd on the value of the discord_notifications_enabled setting
+			// Normal forums have a radio input with the value selected based on the value of the discord_notifications_enabled setting
 			else if ($row['forum_type'] == FORUM_POST)
 			{
 				// The labels for all the inputs are constructed based on the forum IDs to make it easy to know which
-				$input_name = self::FORUM_INPUT_PREFIX . $row['forum_id'];
-				$yes_checked = $row['discord_notifications_enabled'] == 1 ? 'checked' : '';
-				$no_checked = $yes_checked === '' ? 'checked' : '';
-				$html .= "<dl>\n"
-					. "<dt><label for=" . $input_name . ">" . $row['forum_name'] . $colon . "</label></dt>\n"
-					. "<dd>\n"
-					. "<label><input type=\"radio\" class=\"radio\" name=\"" . $input_name . "\" value=\"1\" " . $yes_checked . "/>" . $yes . "</label>\n"
-					. "<label><input type=\"radio\" class=\"radio\" name=\"" . $input_name . "\" value=\"0\" " . $no_checked . "/>" . $no ."</label>\n"
-					. "</dd>\n"
-					. "</dl>\n";
+				$tpl_row = array(
+							'S_IS_CAT'			=> false,
+							'FORUM_NAME'		=> $row['forum_name'],
+							'FORUM_ID'			=> self::FORUM_INPUT_PREFIX . $row['forum_id'],
+							'FORUM_DN_ENABLED'	=> $row['discord_notifications_enabled'],
+						);
+				$this->template->assign_block_vars('forumrow', $tpl_row);
 			}
 			// Other forum types (links) are ignored
 		}
 		$this->db->sql_freeresult($result);
-
-		return $html;
 	}
 }
