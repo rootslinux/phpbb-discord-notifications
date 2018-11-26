@@ -151,11 +151,11 @@ class notification_event_listener implements EventSubscriberInterface
 		{
 			$this->notify_topic_created($post_data);
 		}
-		elseif ($event['mode'] == 'reply') // New post
+		elseif ($event['mode'] == 'reply' || $event['mode'] == 'quote') // New post
 		{
 			$this->notify_post_created($post_data);
 		}
-		elseif ($event['mode'] == 'edit') // Edit existing post
+		elseif ($event['mode'] == 'edit' || $event['mode'] == 'edit_topic' || $event['mode'] == 'edit_first_post' || $event['mode'] == 'edit_last_post') // Edit existing post
 		{
 			// If the post that was edited is the first one in the topic, we consider this a topic update event.
 			if ($event['data']['post_id'] == $event['data']['topic_first_post_id'])
