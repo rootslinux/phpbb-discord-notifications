@@ -46,7 +46,7 @@ $lang = array_merge($lang, array(
 	'DN_MAIN_SETTINGS'				=> 'Paramètres généraux',
 	'DN_MASTER_ENABLE'				=> 'Activer les notifications Discord',
 	'DN_WEBHOOK_URL'				=> 'URL Webhook de Discord',
-	'DN_WEBHOOK_DESCRIPTION'		=> 'Permet de saisir l’adresse URL Webhook du serveur Discord généré par le serveur Discord. Voir <a href="https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks">cet article</a> pour apprendre comment un nouveau Webhook.',
+	'DN_WEBHOOK_DESCRIPTION'		=> 'Permet de saisir l’adresse URL Webhook du serveur Discord généré par le serveur Discord. Voir <a href="https://support.discordapp.com/hc/fr/articles/228383668-Intro-to-Webhooks">cet article</a> pour apprendre comment créer un nouveau Webhook.',
 	'DN_POST_PREVIEW_LENGTH'		=> 'Longueur de l’aperçu des messages',
 	'DN_POST_PREVIEW_DESCRIPTION'	=> 'Permet de saisir le nombre de caractères à afficher dans l’aperçu des messages (10 - 2000). Définir sur la valeur 0 pour désactiver l’aperçu des messages.',
 	'DN_TEST_MESSAGE'				=> 'Message de test',
