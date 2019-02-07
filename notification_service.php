@@ -277,13 +277,15 @@ class notification_service
 		// Clean up the message and footer text before sending by trimming whitespace from the front and end of the message and footer strings.
 		$message = trim($message);
 		$message = str_replace('"', "'", $message); // Replace " characters that would break the JSON encoding that our message must be wrapped in.
+		$message = str_replace("\t"," ", $message); // Replace TAB characters with a space - TAB characters breaks JSON encoding also, apparently.
 		if (isset($footer))
 		{
 			$footer = trim($footer);
 			$footer = str_replace('"', "'", $footer);
 			// Discord does not appear to allow newline characters in the footer. In fact, the presence of them causes the message POST
 			// to fail. Hence why we replace all newlines with a space here.
-			$footer = str_replace(array("\r", "\n"), ' ', $footer);
+			// Discord does not allow tab characters either, so we add those to the array of characters to be removed.
+			$footer = str_replace(array("\r", "\n", "\t"), ' ', $footer);
 		}
 
 		// Abort if we find that either of our text fields are now empty strings
@@ -325,6 +327,7 @@ class notification_service
 		curl_setopt($h, CURLOPT_URL, $discord_webhook_url);
 		curl_setopt($h, CURLOPT_POST, 1);
 		curl_setopt($h, CURLOPT_POSTFIELDS, $post);
+		curl_setopt($h, CURLOPT_RETURNTRANSFER, 1);
 		$response = curl_exec($h);
 		curl_close($h);
 
