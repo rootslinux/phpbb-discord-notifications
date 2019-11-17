@@ -196,8 +196,6 @@ class notification_service
 			return null;
 		}
 
-		$user_id = intval($user_id);
-
 		$sql = "SELECT username from " . USERS_TABLE . " WHERE user_id = " . (int)$user_id;
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
