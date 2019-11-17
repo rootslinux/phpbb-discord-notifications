@@ -168,8 +168,6 @@ class notification_service
 			return array();
 		}
 
-		$topic_id = intval($topic_id);
-
 		$topic_table = TOPICS_TABLE;
 		$forum_table = FORUMS_TABLE;
 		$sql = "SELECT
