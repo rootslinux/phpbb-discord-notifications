@@ -322,6 +322,7 @@ class notification_service
 
 		// Use the CURL library to transmit the message via a POST operation to the webhook URL.
 		$h = curl_init();
+		curl_setopt($h, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
 		curl_setopt($h, CURLOPT_URL, $discord_webhook_url);
 		curl_setopt($h, CURLOPT_POST, 1);
 		curl_setopt($h, CURLOPT_POSTFIELDS, $post);
