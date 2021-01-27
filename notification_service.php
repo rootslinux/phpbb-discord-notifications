@@ -168,13 +168,11 @@ class notification_service
 			return array();
 		}
 
-		$topic_table = TOPICS_TABLE;
-		$forum_table = FORUMS_TABLE;
 		$sql = "SELECT
 				f.forum_id, f.forum_name,
 				t.topic_id, t.topic_title, t.topic_poster, t.topic_first_post_id, t.topic_first_poster_name, t.topic_posts_approved, t.topic_visibility
 				FROM
-				$forum_table f, $topic_table t
+				" . FORUMS_TABLE . " f, " . TOPICS_TABLE . " t
 				WHERE
 				t.forum_id = f.forum_id and t.topic_id = " . $this->db->sql_escape($topic_id);
 		$result = $this->db->sql_query($sql);
