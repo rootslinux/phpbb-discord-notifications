@@ -45,8 +45,8 @@ class notification_service
 
 	/**
 	 * Check whether notifications are enabled for a certain type
-	 * @param $notification_type The name of the notification type to check
-	 * @return False if the global notification setting is disabled or this notification type is disabled
+	 * @param $notification_type string The name of the notification type to check
+	 * @return bool if the global notification setting is disabled or this notification type is disabled
 	 */
 	public function is_notification_type_enabled($notification_type)
 	{
@@ -61,8 +61,8 @@ class notification_service
 
 	/**
 	 * Check whether notifications that occur on a specific forum should be generated
-	 * @param $forum_id The ID of the forum to check
-	 * @return False if the global notification setting is disabled, notifications are disabled for the forum, or no forum exists with this ID
+	 * @param $forum_id int The ID of the forum to check
+	 * @return bool if the global notification setting is disabled, notifications are disabled for the forum, or no forum exists with this ID
 	 */
 	public function is_notification_forum_enabled($forum_id)
 	{
@@ -88,7 +88,7 @@ class notification_service
 
 	/**
 	 * Retrieve the value for the ACP settings configuration related to post preview length
-	 * @return The number of characters to display in the post preview. A zero value indicates that no preview should be displayed
+	 * @return int The number of characters to display in the post preview. A zero value indicates that no preview should be displayed
 	 */
 	public function get_post_preview_length()
 	{
@@ -97,8 +97,8 @@ class notification_service
 
 	/**
 	 * Retrieves the name of a forum from the database when given an ID
-	 * @param $forum_id The ID of the forum to query
-	 * @return The name of the forum, or NULL if not found
+	 * @param $forum_id int The ID of the forum to query
+	 * @return null|string The name of the forum, or NULL if not found
 	 */
 	public function query_forum_name($forum_id)
 	{
@@ -117,8 +117,8 @@ class notification_service
 
 	/**
 	 * Retrieves the subject of a post from the database when given an ID
-	 * @param $post_id The ID of the post to query
-	 * @return The subject of the post, or NULL if not found
+	 * @param $post_id int The ID of the post to query
+	 * @return null|string The subject of the post, or NULL if not found
 	 */
 	public function query_post_subject($post_id)
 	{
@@ -137,8 +137,8 @@ class notification_service
 
 	/**
 	 * Retrieves the title of a topic from the database when given an ID
-	 * @param $topic_id The ID of the topic to query
-	 * @return The name of the topic, or NULL if not found
+	 * @param $topic_id int The ID of the topic to query
+	 * @return null|string The name of the topic, or NULL if not found
 	 */
 	public function query_topic_title($topic_id)
 	{
@@ -158,8 +158,8 @@ class notification_service
 	/**
 	* Runs a query to fetch useful data about a specific forum topic. The return data includes information on the first poster, number of posts,
 	* which forum contains the topic, and more.
-	* @param $topic_id The ID of the topic to query
-	* @return Array containing data about the topic and the forum it is contained in
+	* @param $topic_id int The ID of the topic to query
+	* @return array containing data about the topic and the forum it is contained in
 	*/
 	public function query_topic_details($topic_id)
 	{
@@ -184,8 +184,8 @@ class notification_service
 
 	/**
 	 * Retrieves the name of a user from the database when given an ID
-	 * @param $user_id The ID of the user to query
-	 * @return The name of the user, or NULL if not found
+	 * @param $user_id int The ID of the user to query
+	 * @return null|string The name of the user, or NULL if not found
 	 */
 	public function query_user_name($user_id)
 	{
@@ -205,11 +205,11 @@ class notification_service
 	/**
 	 * Sends a notification message to Discord. This function checks the master switch configuration for the extension, but does
 	 * no further checks. The caller is responsible for performing full validation of the notification prior to calling this function.
-	 * @param $color The color to use in the notification (decimal value of a hexadecimal RGB code)
-	 * @param $message The message text to send.
-	 * @param $footer Text to place in the footer of the message. Optional.
+	 * @param $color string The color to use in the notification (decimal value of a hexadecimal RGB code)
+	 * @param $message string The message text to send.
+	 * @param $footer null|string Text to place in the footer of the message. Optional.
 	 */
-	public function send_discord_notification($color, $message, $footer = NULL)
+	public function send_discord_notification($color, $message, $footer = null)
 	{
 		if ($this->config['discord_notifications_enabled'] == 0 || isset($message) == false)
 		{
@@ -225,9 +225,9 @@ class notification_service
 	/**
 	 * Sends a message to Discord, disregarding any configurations that are currently set. This method is primarily used by users
 	 * to test their notifications from the ACP.
-	 * @param $discord_webhook_url The URL of the Discord webhook to transmit the message to. If this is an invalid URL, no message will be sent.
-	 * @param $message The message text to send. Must be a non-empty string.
-	 * @return Boolean indicating whether the message transmission resulted in success or failure.
+	 * @param $discord_webhook_url string The URL of the Discord webhook to transmit the message to. If this is an invalid URL, no message will be sent.
+	 * @param $message string The message text to send. Must be a non-empty string.
+	 * @return bool indicating whether the message transmission resulted in success or failure.
 	 */
 	public function force_send_discord_notification($discord_webhook_url, $message)
 	{
@@ -245,14 +245,14 @@ class notification_service
 	 * API, but it does -not- check configuration settings such as the post_preview_length. The code invoking this method is responsible
 	 * for checking those settings.
 	 *
-	 * @param $discord_webhook_url The URL of the Discord webhook to transmit the message to.
-	 * @param $color Color to set for the message. Should be a positive non-zero integer representing a hex color code.
-	 * @param $message The message text to send. Must be a non-empty string.
-	 * @param $footer The text to place in the footer. Optional. Must be a non-empty string.
-	 * @return Boolean indicating whether the message transmission resulted in success or failure.
+	 * @param $discord_webhook_url string The URL of the Discord webhook to transmit the message to.
+	 * @param $color string Color to set for the message. Should be a positive non-zero integer representing a hex color code.
+	 * @param $message string The message text to send. Must be a non-empty string.
+	 * @param $footer null|string The text to place in the footer. Optional. Must be a non-empty string.
+	 * @return bool indicating whether the message transmission resulted in success or failure.
 	 * @see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
 	 */
-	private function execute_discord_webhook($discord_webhook_url, $color, $message, $footer = NULL)
+	private function execute_discord_webhook($discord_webhook_url, $color, $message, $footer = null)
 	{
 		if (isset($discord_webhook_url) == false || $discord_webhook_url === '')
 		{

@@ -400,7 +400,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a new post is created.
-	 * @param $data Array of attributes for the new post
+	 * @param $data array of attributes for the new post
 	 */
 	private function notify_post_created($data)
 	{
@@ -431,7 +431,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a post is updated.
-	 * @param $data Array of attributes for the updated post
+	 * @param $data array of attributes for the updated post
 	 */
 	private function notify_post_updated($data)
 	{
@@ -479,7 +479,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a post is deleted.
-	 * @param $data Array of attributes for the deleted post
+	 * @param $data array of attributes for the deleted post
 	 */
 	private function notify_post_deleted($data)
 	{
@@ -517,7 +517,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a post is locked.
-	 * @param $data Array of attributes for the locked post
+	 * @param $data array of attributes for the locked post
 	 */
 	private function notify_post_locked($data)
 	{
@@ -545,7 +545,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a post is unlocked.
-	 * @param $data Array of attributes for the unlocked post
+	 * @param $data array of attributes for the unlocked post
 	 */
 	private function notify_post_unlocked($data)
 	{
@@ -573,7 +573,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a new topic is created.
-	 * @param $data Array of attributes for the new topic
+	 * @param $data array of attributes for the new topic
 	 */
 	private function notify_topic_created($data)
 	{
@@ -603,7 +603,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a topic is updated.
-	 * @param $data Array of attributes for the updated topic
+	 * @param $data array of attributes for the updated topic
 	 */
 	private function notify_topic_updated($data)
 	{
@@ -650,7 +650,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a topic is deleted.
-	 * @param $data Array of attributes for the deleted topic
+	 * @param $data array of attributes for the deleted topic
 	 */
 	private function notify_topic_deleted($data)
 	{
@@ -676,7 +676,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a topic is locked.
-	 * @param $data Array of attributes for the locked topic
+	 * @param $data array of attributes for the locked topic
 	 */
 	private function notify_topic_locked($data)
 	{
@@ -703,7 +703,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a topic is unlocked.
-	 * @param $data Array of attributes for the unlocked topic
+	 * @param $data array of attributes for the unlocked topic
 	 */
 	private function notify_topic_unlocked($data)
 	{
@@ -730,7 +730,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when a new user account is created.
-	 * @param $data Array of attributes for the new user
+	 * @param $data array of attributes for the new user
 	 *
 	 * Notification details include the user name and a link to the user's profile page.
 	 */
@@ -757,7 +757,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Sends a notification to Discord when one or more user accounts are deleted.
-	 * @param $data Array of attributes for the deleted users (id => username)
+	 * @param $data array of attributes for the deleted users (id => username)
 	 *
 	 * The notification lists the usernames of those deleted but provides no links or additional information such as deletion reason.
 	 */
@@ -825,7 +825,7 @@ class notification_event_listener implements EventSubscriberInterface
 	/**
 	 * The Discord webhook api does not accept urlencoded text. This function replaces problematic characters.
 	 * @param $url
-	 * @return Formatted URL text
+	 * @return string Formatted URL text
 	 */
 	private function reformat_link_url($url)
 	{
@@ -837,8 +837,8 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Discord link text must be surrounded by []. This function replaces problematic characters
-	 * @param $text Text link
-	 * @return Formatted link-safe text
+	 * @param $text string Text link
+	 * @return string Formatted link-safe text
 	 */
 	private function reformat_link_text($text)
 	{
@@ -850,8 +850,8 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Removes all HTML and BBcode formatting tags from a string
-	 * @param $text Text link
-	 * @return Formatted text
+	 * @param $text string Text link
+	 * @return string Formatted text
 	 *
 	 * Note that there is some risk here of the text not coming out exactly as we may like. The user text
 	 * may include characters that look like pseudo-HTML and get picked up by the regex used.
@@ -866,10 +866,10 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Given the ID of a forum, returns text that contains a link to view the forum
-	 * @param $topic_id The ID of the topic
-	 * @param $post_id The ID of the post
-	 * @param $text The text to display for the post link
-	 * @return Text formatted in the notation that Discord would interpret.
+	 * @param $topic_id int The ID of the topic
+	 * @param $post_id int The ID of the post
+	 * @param $text string The text to display for the post link
+	 * @return string Text formatted in the notation that Discord would interpret.
 	 */
 	private function generate_forum_link($forum_id, $text)
 	{
@@ -881,10 +881,10 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Given the ID of a valid post, returns text that contains the post title with a link to the post.
-	 * @param $topic_id The ID of the topic
-	 * @param $post_id The ID of the post
-	 * @param $text The text to display for the post link
-	 * @return Text formatted in the notation that Discord would interpret.
+	 * @param $topic_id int The ID of the topic
+	 * @param $post_id int The ID of the post
+	 * @param $text string The text to display for the post link
+	 * @return string Text formatted in the notation that Discord would interpret.
 	 */
 	private function generate_post_link($topic_id, $post_id, $text)
 	{
@@ -896,9 +896,9 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Given the ID of a valid topic, returns text that contains the topic title with a link to the topic.
-	 * @param $topic_id The ID of the topic
-	 * @param $text The text to display for the topic link
-	 * @return Text formatted in the notation that Discord would interpret.
+	 * @param $topic_id int The ID of the topic
+	 * @param $text string The text to display for the topic link
+	 * @return string Text formatted in the notation that Discord would interpret.
 	 */
 	private function generate_topic_link($topic_id, $text)
 	{
@@ -910,9 +910,9 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Given the ID of a valid user, returns text that contains the user name with a link to their user profile.
-	 * @param $user_id The ID of the user
-	 * @param $text The text to display for the user link
-	 * @return Text formatted in the notation that Discord would interpret.
+	 * @param $user_id int The ID of the user
+	 * @param $text string The text to display for the user link
+	 * @return string Text formatted in the notation that Discord would interpret.
 	 */
 	private function generate_user_link($user_id, $text)
 	{
@@ -924,9 +924,9 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Formats and prepares text to be placed in the footer of a notification message.
-	 * @param $prepend_text Text to add before the content
-	 * @param $content The raw text to place in the footer
-	 * @return A string meeting the configuration requirements for a footer, or NULL if a footer should not be generated at all.
+	 * @param $prepend_text string Text to add before the content
+	 * @param $content string The raw text to place in the footer
+	 * @return string A string meeting the configuration requirements for a footer, or NULL if a footer should not be generated at all.
 	 */
 	private function generate_footer_text($prepend_text, $content)
 	{
