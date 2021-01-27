@@ -77,7 +77,7 @@ class notification_service
 		}
 
 		// Query the forum table where forum notification settings are stored
-		$sql = "SELECT discord_notifications_enabled FROM " . FORUMS_TABLE . " WHERE forum_id = $forum_id";
+		$sql = "SELECT discord_notifications_enabled FROM " . FORUMS_TABLE . " WHERE forum_id = " . $this->db->sql_escape($forum_id);
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
 		$enabled = $data['discord_notifications_enabled'] == 1 ? true : false;
@@ -107,7 +107,7 @@ class notification_service
 			return null;
 		}
 
-		$sql = "SELECT forum_name from " . FORUMS_TABLE . " WHERE forum_id = $forum_id";
+		$sql = "SELECT forum_name from " . FORUMS_TABLE . " WHERE forum_id = " . $this->db->sql_escape($forum_id);
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
 		$name = $data['forum_name'];
@@ -127,7 +127,7 @@ class notification_service
 			return null;
 		}
 
-		$sql = "SELECT post_subject from " . POSTS_TABLE . " WHERE post_id = $post_id";
+		$sql = "SELECT post_subject from " . POSTS_TABLE . " WHERE post_id = " . $this->db->sql_escape($post_id);
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
 		$subject = $data['post_subject'];
@@ -147,7 +147,7 @@ class notification_service
 			return null;
 		}
 
-		$sql = "SELECT topic_title from " . TOPICS_TABLE . " WHERE topic_id = $topic_id";
+		$sql = "SELECT topic_title from " . TOPICS_TABLE . " WHERE topic_id = " . $this->db->sql_escape($topic_id);
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
 		$title = $data['topic_title'];
@@ -176,7 +176,7 @@ class notification_service
 				FROM
 				$forum_table f, $topic_table t
 				WHERE
-				t.forum_id = f.forum_id and t.topic_id = $topic_id";
+				t.forum_id = f.forum_id and t.topic_id = " . $this->db->sql_escape($topic_id);
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -196,7 +196,7 @@ class notification_service
 			return null;
 		}
 
-		$sql = "SELECT username from " . USERS_TABLE . " WHERE user_id = $user_id";
+		$sql = "SELECT username from " . USERS_TABLE . " WHERE user_id = " . $this->db->sql_escape($user_id);
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
 		$name = $data['username'];

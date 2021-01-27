@@ -227,7 +227,7 @@ class discord_notifications_module
 		foreach ($forum_id_names as $id => $input_name)
 		{
 			$enabled = (int)$this->request->variable($input_name, 0);
-			$sql = "UPDATE " . FORUMS_TABLE . " SET discord_notifications_enabled = $enabled WHERE forum_id = $id";
+			$sql = "UPDATE " . FORUMS_TABLE . " SET discord_notifications_enabled = " . $this->db->sql_escape($enabled) . "WHERE forum_id = " . $this->db->sql_escape($id);
 			$this->db->sql_query($sql);
 			// TODO: It would be better to do this update in a single operation instead of once for each input inside this loop
 		}
