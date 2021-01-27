@@ -311,21 +311,27 @@ class notification_service
 		}
 
 		// Place the message inside the JSON structure that Discord expects to receive at the REST endpoint.
-		$post = '';
-		if (isset($footer))
-		{
-			$post = sprintf('{"embeds": [{"color": "%d", "description" : "%s", "footer": {"text": "%s"}}]}', $color, $message, $footer);
+
+		$embed = [
+			"color"       => $color,
+			"description" => $message
+		];
+
+		if (isset($footer)) {
+			$embed["footer"] = ["text" => $footer];
 		}
-		else {
-			$post = sprintf('{"embeds": [{"color": "%d", "description" : "%s"}]}', $color, $message);
-		}
+
+		$payload = [
+			'embeds' => [$embed]
+		];
+		$json = \json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 		// Use the CURL library to transmit the message via a POST operation to the webhook URL.
 		$h = curl_init();
 		curl_setopt($h, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
 		curl_setopt($h, CURLOPT_URL, $discord_webhook_url);
 		curl_setopt($h, CURLOPT_POST, 1);
-		curl_setopt($h, CURLOPT_POSTFIELDS, $post);
+		curl_setopt($h, CURLOPT_POSTFIELDS, $json);
 		curl_setopt($h, CURLOPT_RETURNTRANSFER, 1);
 		$response = curl_exec($h);
 		curl_close($h);
