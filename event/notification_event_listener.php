@@ -844,6 +844,7 @@ class notification_event_listener implements EventSubscriberInterface
 	{
 		$text = str_replace("[", "(", $text);
 		$text = str_replace("]", ")", $text);
+		$text = html_entity_decode($text, ENT_COMPAT);
 		return $text;
 	}
 
@@ -859,6 +860,7 @@ class notification_event_listener implements EventSubscriberInterface
 	{
 		$text = strip_tags($text);
 		$text = preg_replace('|[[\/\!]*?[^\[\]]*?]|si', '', $text);
+		$text = html_entity_decode($text, ENT_COMPAT);
 		return $text;
 	}
 
