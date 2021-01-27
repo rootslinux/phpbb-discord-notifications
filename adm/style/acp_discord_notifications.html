@@ -9,38 +9,38 @@
 	<fieldset>
 		<legend>{L_DN_MAIN_SETTINGS}</legend>
 		<dl>
-			<dt><label for="dn_master_enable">{L_DN_MASTER_ENABLE}{L_COLON}</label></dt>
+			<dt><label>{L_DN_MASTER_ENABLE}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_master_enable" value="1" <!-- IF DN_MASTER_ENABLE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_master_enable" value="0" <!-- IF not DN_MASTER_ENABLE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
 			<dt><label for="dn_webhook_url">{L_DN_WEBHOOK_URL}{L_COLON}</label><br /><span>{L_DN_WEBHOOK_DESCRIPTION}</span></dt>
 			<dd>
-				<input name="dn_webhook_url" type="text" value="{{ DN_WEBHOOK_URL }}" size="100" maxlength="255" />
+				<input id="dn_webhook_url" name="dn_webhook_url" type="text" value="{{ DN_WEBHOOK_URL }}" size="100" maxlength="255" />
 			</dd>
 		</dl>
 		<dl>
 			<dt><label for="dn_post_preview_length">{L_DN_POST_PREVIEW_LENGTH}{L_COLON}</label><br /><span>{L_DN_POST_PREVIEW_DESCRIPTION}</span></dt>
 			<dd>
-				<input name="dn_post_preview_length" type="text" value="{{ DN_POST_PREVIEW_LENGTH }}" size="4" maxlength="4" />
+				<input id="dn_post_preview_length" name="dn_post_preview_length" type="text" value="{{ DN_POST_PREVIEW_LENGTH }}" size="4" maxlength="4" />
 			</dd>
 		</dl>
 		<dl>
 			<dt><label for="dn_test_message">{L_DN_TEST_MESSAGE}{L_COLON}</label><br /><span>{L_DN_TEST_DESCRIPTION}</span></dt>
 			<dd>
-				<input name="dn_test_message" type="text" value="{{ DN_TEST_MESSAGE_TEXT }}" size="100" maxlength="255" />
+				<input id="dn_test_message" name="dn_test_message" type="text" value="{{ DN_TEST_MESSAGE_TEXT }}" size="100" maxlength="255" />
 			</dd>
 		</dl>
 		<dl>
 			<dt><label for="dn_connect_to">{L_DN_CONNECT_TIMEOUT}{L_COLON}</label><br /><span>{L_DN_CONNECT_TO_DESCRIPTION}</span></dt>
 			<dd>
-				<input name="dn_connect_to" type="text" value="{{ DN_CONNECT_TIMEOUT }}" size="4" maxlength="4" />
+				<input id="dn_connect_to" name="dn_connect_to" type="text" value="{{ DN_CONNECT_TIMEOUT }}" size="4" maxlength="4" />
 			</dd>
 		</dl>
 		<dl>
 			<dt><label for="dn_exec_to">{L_DN_EXEC_TIMEOUT}{L_COLON}</label><br /><span>{L_DN_EXEC_TO_DESCRIPTION}</span></dt>
 			<dd>
-				<input name="dn_exec_to" type="text" value="{{ DN_EXEC_TIMEOUT }}" size="4" maxlength="4" />
+				<input id="dn_exec_to" name="dn_exec_to" type="text" value="{{ DN_EXEC_TIMEOUT }}" size="4" maxlength="4" />
 			</dd>
 		</dl>
 		<dl>
@@ -53,62 +53,62 @@
 		<legend>{L_DN_TYPE_SETTINGS}</legend>
 		<p>{L_DN_TYPE_DESCRIPTION}</p>
 		<dl>
-			<dt><label for="dn_post_create">{L_DN_POST_CREATE}{L_COLON}</label></dt>
+			<dt><label>{L_DN_POST_CREATE}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_post_create" value="1" <!-- IF DN_POST_CREATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_post_create" value="0" <!-- IF not DN_POST_CREATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_post_update">{L_DN_POST_UPDATE}{L_COLON}</label></dt>
+			<dt><label>{L_DN_POST_UPDATE}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_post_update" value="1" <!-- IF DN_POST_UPDATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_post_update" value="0" <!-- IF not DN_POST_UPDATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_post_delete">{L_DN_POST_DELETE}{L_COLON}</label></dt>
+			<dt><label>{L_DN_POST_DELETE}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_post_delete" value="1" <!-- IF DN_POST_DELETE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_post_delete" value="0" <!-- IF not DN_POST_DELETE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_post_lock">{L_DN_POST_LOCK}{L_COLON}</label></dt>
+			<dt><label>{L_DN_POST_LOCK}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_post_lock" value="1" <!-- IF DN_POST_LOCK -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_post_lock" value="0" <!-- IF not DN_POST_LOCK -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_post_unlock">{L_DN_POST_UNLOCK}{L_COLON}</label></dt>
+			<dt><label>{L_DN_POST_UNLOCK}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_post_unlock" value="1" <!-- IF DN_POST_UNLOCK -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_post_unlock" value="0" <!-- IF not DN_POST_UNLOCK -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_topic_create">{L_DN_TOPIC_CREATE}{L_COLON}</label></dt>
+			<dt><label>{L_DN_TOPIC_CREATE}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_topic_create" value="1" <!-- IF DN_TOPIC_CREATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_topic_create" value="0" <!-- IF not DN_TOPIC_CREATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_topic_update">{L_DN_TOPIC_UPDATE}{L_COLON}</label></dt>
+			<dt><label>{L_DN_TOPIC_UPDATE}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_topic_update" value="1" <!-- IF DN_TOPIC_UPDATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_topic_update" value="0" <!-- IF not DN_TOPIC_UPDATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_topic_delete">{L_DN_TOPIC_DELETE}{L_COLON}</label></dt>
+			<dt><label>{L_DN_TOPIC_DELETE}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_topic_delete" value="1" <!-- IF DN_TOPIC_DELETE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_topic_delete" value="0" <!-- IF not DN_TOPIC_DELETE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_topic_lock">{L_DN_TOPIC_LOCK}{L_COLON}</label></dt>
+			<dt><label>{L_DN_TOPIC_LOCK}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_topic_lock" value="1" <!-- IF DN_TOPIC_LOCK -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_topic_lock" value="0" <!-- IF not DN_TOPIC_LOCK -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_topic_unlock">{L_DN_TOPIC_UNLOCK}{L_COLON}</label></dt>
+			<dt><label>{L_DN_TOPIC_UNLOCK}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_topic_unlock" value="1" <!-- IF DN_TOPIC_UNLOCK -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_topic_unlock" value="0" <!-- IF not DN_TOPIC_UNLOCK -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_user_create">{L_DN_USER_CREATE}{L_COLON}</label></dt>
+			<dt><label>{L_DN_USER_CREATE}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_user_create" value="1" <!-- IF DN_USER_CREATE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_user_create" value="0" <!-- IF not DN_USER_CREATE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_user_delete">{L_DN_USER_DELETE}{L_COLON}</label></dt>
+			<dt><label>{L_DN_USER_DELETE}{L_COLON}</label></dt>
 			<dd><label><input type="radio" class="radio" name="dn_user_delete" value="1" <!-- IF DN_USER_DELETE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_user_delete" value="0" <!-- IF not DN_USER_DELETE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
@@ -125,7 +125,7 @@
 					</dl>
 				<!-- ELSE -->
 					<dl>
-						<dt><label for="{forumrow.FORUM_ID}">{forumrow.FORUM_NAME}</label></dt>
+						<dt><label>{forumrow.FORUM_NAME}</label></dt>
 						<dd>
 							<label><input type="radio" class="radio" name="{forumrow.FORUM_ID}" value="1" <!-- IF forumrow.FORUM_DN_ENABLED -->checked="checked"<!-- ENDIF --> /> {L_YES}</label>
 							<label><input type="radio" class="radio" name="{forumrow.FORUM_ID}" value="0" <!-- IF not forumrow.FORUM_DN_ENABLED -->checked="checked"<!-- ENDIF --> /> {L_NO}</label>
