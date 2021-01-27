@@ -33,6 +33,10 @@ $lang = array_merge($lang, array(
 	'DN_TEST_DESCRIPTION'			=> 'A message to send to Discord to verify that the connection with phpBB is functioning.',
 	'DN_SEND_TEST'					=> 'Send Test Message',
 	'DN_SEND_TEST_DESCRIPTION'		=> 'Sends the contents of the test message to the Discord webhook. Use this to verify that your webhook is properly functioning.',
+	'DN_CONNECT_TIMEOUT'			=> 'Connect timeout',
+	'DN_CONNECT_TO_DESCRIPTION'     => 'Timeout in seconds to establish a connection to the Webhook endpoint.',
+	'DN_EXEC_TIMEOUT'               => 'Transfer timeout',
+	'DN_EXEC_TO_DESCRIPTION'        => 'Timeout in seconds for data transfer.',
 
 	'DN_TYPE_SETTINGS'				=> 'Notification Types',
 	'DN_TYPE_DESCRIPTION'			=> 'Select which types of notifications should generate messages that get sent to Discord',

@@ -81,6 +81,10 @@ class extension_installation extends \phpbb\db\migration\migration
 			array('config.add', array('discord_notifications_webhook_url', '')),
 			// The maximum number of characters permitted in a discord notification message
 			array('config.add', array('discord_notifications_post_preview_length', 200)),
+			// Timeout values
+			array('config.add', array('discord_notifications_connect_timeout', 2)),
+			array('config.add', array('discord_notifications_exec_timeout', 2)),
+
 
 			// These configurations represent the various types of notifications that can be sent, which can be individually enabled or disabled.
 			// Upon installation, every notification type is enabled by default.

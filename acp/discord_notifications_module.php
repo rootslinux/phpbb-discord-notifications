@@ -103,6 +103,8 @@ class discord_notifications_module
 			'DN_WEBHOOK_URL'			=> $this->config['discord_notifications_webhook_url'],
 			'DN_POST_PREVIEW_LENGTH'	=> $this->config['discord_notifications_post_preview_length'],
 			'DN_TEST_MESSAGE_TEXT'		=> $this->user->lang('DN_TEST_MESSAGE_TEXT'),
+			'DN_CONNECT_TIMEOUT'		=> $this->config['discord_notifications_connect_timeout'],
+			'DN_EXEC_TIMEOUT'			=> $this->config['discord_notifications_exec_timeout'],
 
 			'DN_POST_CREATE'			=> $this->config['discord_notification_type_post_create'],
 			'DN_POST_UPDATE'			=> $this->config['discord_notification_type_post_update'],
@@ -189,9 +191,21 @@ class discord_notifications_module
 			trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 
+		$connect_timeout = (int) $this->request->variable('dn_connect_to', 0);
+		if ($connect_timeout < 1) {
+			$connect_timeout = 1;
+		}
+
+		$exec_timeout = (int) $this->request->variable('dn_exec_to', 0);
+		if ($exec_timeout < 1) {
+			$exec_timeout = 1;
+		}
+
 		$this->config->set('discord_notifications_enabled', $master_enable);
 		$this->config->set('discord_notifications_webhook_url', $webhook_url);
 		$this->config->set('discord_notifications_post_preview_length', $preview_length);
+		$this->config->set('discord_notifications_connect_timeout', $connect_timeout);
+		$this->config->set('discord_notifications_exec_timeout', $exec_timeout);
 
 		$this->config->set('discord_notification_type_post_create', $this->request->variable('dn_post_create', 0));
 		$this->config->set('discord_notification_type_post_update', $this->request->variable('dn_post_update', 0));

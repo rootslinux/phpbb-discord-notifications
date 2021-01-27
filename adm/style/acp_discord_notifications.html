@@ -32,6 +32,18 @@
 			</dd>
 		</dl>
 		<dl>
+			<dt><label for="dn_connect_to">{L_DN_CONNECT_TIMEOUT}{L_COLON}</label><br /><span>{L_DN_CONNECT_TO_DESCRIPTION}</span></dt>
+			<dd>
+				<input name="dn_connect_to" type="text" value="{{ DN_CONNECT_TIMEOUT }}" size="4" maxlength="4" />
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_exec_to">{L_DN_EXEC_TIMEOUT}{L_COLON}</label><br /><span>{L_DN_EXEC_TO_DESCRIPTION}</span></dt>
+			<dd>
+				<input name="dn_exec_to" type="text" value="{{ DN_EXEC_TIMEOUT }}" size="4" maxlength="4" />
+			</dd>
+		</dl>
+		<dl>
 			<dt><label for="action_send_test_message">{L_DN_SEND_TEST}{L_COLON}</label><br /><span>{L_DN_SEND_TEST_DESCRIPTION}</span></dt>
 			<dd><input class="button2" type="submit" id="action_send_test_message" name="action_send_test_message" value="{{ lang('DN_SEND_TEST') }}" /></dd>
 		</dl>

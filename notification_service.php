@@ -31,16 +31,20 @@ class notification_service
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
 
+	/** @var \phpbb\log\log $log */
+	protected $log;
+
 	/**
 	 * Constructor
 	 *
 	 * @param \phpbb\config\config $config
 	 * @param \phpbb\db\driver\driver_interface $db
 	 */
-	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db)
+	public function __construct(\phpbb\config\config $config, \phpbb\db\driver\driver_interface $db, \phpbb\log\log $log)
 	{
 		$this->config = $config;
 		$this->db = $db;
+		$this->log = $log;
 	}
 
 	/**
@@ -333,13 +337,21 @@ class notification_service
 		curl_setopt($h, CURLOPT_POST, 1);
 		curl_setopt($h, CURLOPT_POSTFIELDS, $json);
 		curl_setopt($h, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($h, CURLOPT_CONNECTTIMEOUT, (int) $this->config['discord_notifications_connect_timeout']);
+		curl_setopt($h, CURLOPT_TIMEOUT, (int) $this->config['discord_notifications_exec_timeout']);
 		$response = curl_exec($h);
+		$error = curl_errno($h);
+		$status = curl_getinfo($h, CURLINFO_HTTP_CODE);
 		curl_close($h);
 
-		// Check if the response was not successful
-		if (is_array($response) && $response['message'])
-		{
-			// TODO: If the response includes a message then an error has occurred. Determine whether we want to log it, queue it up to try again, etc.
+		// TODO: Retry?
+		if ($error == 0) {
+			if ($status < 200 || $status > 299) {
+				$this->log->add('admin', ANONYMOUS, '', 'ACP_DISCORD_NOTIFICATIONS_WEBHOOK_ERROR', time(), [$status]);
+				return false;
+			}
+		} else {
+			$this->log->add('admin', ANONYMOUS, '', 'ACP_DISCORD_NOTIFICATIONS_CURL_ERROR', time(), [$error]);
 			return false;
 		}
 
