@@ -12,7 +12,12 @@
             "name": "Tyler Olsen",
             "homepage": "https://github.com/rootslinux",
             "role": "Lead Developer"
-        }
+        },
+		{
+			"name": "Micha Ober",
+			"homepage": "https://github.com/m-ober",
+			"role": "Developer"
+		}
     ],
     "require": {
         "php": ">=5.3.3",
