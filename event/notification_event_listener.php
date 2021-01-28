@@ -667,8 +667,10 @@ class notification_event_listener implements EventSubscriberInterface
 		// Construct the notification message using the argument data
 		$user_link = $this->generate_user_link($data['user_id'], $data['user_name']);
 		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
+		$topic_title = html_entity_decode($data['topic_title'], ENT_COMPAT);
+
 		$message = sprintf($this->language->lang('DELETE_TOPIC'),
-			$emoji, $user_link, $data['topic_title'], $data['topic_post_count'], $forum_link
+			$emoji, $user_link, $topic_title, $data['topic_post_count'], $forum_link
 		);
 
 		$this->notification_service->send_discord_notification($color, $message);
