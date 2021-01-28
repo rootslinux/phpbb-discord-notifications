@@ -870,8 +870,7 @@ class notification_event_listener implements EventSubscriberInterface
 
 	/**
 	 * Given the ID of a forum, returns text that contains a link to view the forum
-	 * @param $topic_id int The ID of the topic
-	 * @param $post_id int The ID of the post
+	 * @param $forum_id int The ID of the forum
 	 * @param $text string The text to display for the post link
 	 * @return string Text formatted in the notation that Discord would interpret.
 	 */
