@@ -347,11 +347,11 @@ class notification_service
 		// TODO: Retry?
 		if ($error == 0) {
 			if ($status < 200 || $status > 299) {
-				$this->log->add('admin', ANONYMOUS, '', 'ACP_DISCORD_NOTIFICATIONS_WEBHOOK_ERROR', time(), [$status]);
+				$this->log->add('admin', ANONYMOUS, '127.0.0.1', 'ACP_DISCORD_NOTIFICATIONS_WEBHOOK_ERROR', time(), [$status]);
 				return false;
 			}
 		} else {
-			$this->log->add('admin', ANONYMOUS, '', 'ACP_DISCORD_NOTIFICATIONS_CURL_ERROR', time(), [$error]);
+			$this->log->add('admin', ANONYMOUS, '127.0.0.1', 'ACP_DISCORD_NOTIFICATIONS_CURL_ERROR', time(), [$error]);
 			return false;
 		}
 
