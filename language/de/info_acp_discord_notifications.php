@@ -25,4 +25,5 @@ $lang = array_merge($lang, array(
 	'ACP_DISCORD_NOTIFICATIONS_LOG_UPDATE'		=> 'Discord Benachrichtigungen: Einstellungen aktualisiert',
 	'ACP_DISCORD_NOTIFICATIONS_WEBHOOK_ERROR'	=> 'Discord Benachrichtigungen: HTTP Fehlercode %d',
 	'ACP_DISCORD_NOTIFICATIONS_CURL_ERROR'	    => 'Discord Benachrichtigungen: cURL Fehlercode %d',
+	'ACP_DISCORD_NOTIFICATIONS_JSON_ERROR'	    => 'Discord Benachrichtigungen: JSON Fehler: %s',
 ));

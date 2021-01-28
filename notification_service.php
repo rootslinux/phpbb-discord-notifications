@@ -321,7 +321,12 @@ class notification_service
 		$payload = [
 			'embeds' => [$embed]
 		];
+
 		$json = \json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		if ($json === false) {
+			$this->log->add('admin', ANONYMOUS, '127.0.0.1', 'ACP_DISCORD_NOTIFICATIONS_JSON_ERROR', time(), [json_last_error_msg()]);
+			return false;
+		}
 
 		// Use the CURL library to transmit the message via a POST operation to the webhook URL.
 		$h = curl_init();
