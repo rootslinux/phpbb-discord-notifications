@@ -19,11 +19,13 @@ class notification_service
 	// Reference: https://discordapp.com/developers/docs/resources/channel#embed-limits
 	const MAX_MESSAGE_SIZE = 2048;
 
-	// Maximum number of characters allowed by Discord in a message footer.
+	// Maximum number of characters (not bytes) allowed by Discord in a message footer.
 	const MAX_FOOTER_SIZE = 2048;
 
 	// The notification color (gray) to use as a default if a missing or invalid color value is received.
 	const DEFAULT_COLOR = 11777212;
+
+	const ELLIPSIS = '…';
 
 	/** @var \phpbb\config\config */
 	protected $config;
@@ -295,16 +297,13 @@ class notification_service
 
 		// Verify that the message and footer size is within the allowable limit and truncate if necessary. We add "..." as the last three characters
 		// when we require truncation.
-		if (strlen($message) > self::MAX_MESSAGE_SIZE)
+		if (mb_strlen($message) > self::MAX_MESSAGE_SIZE)
 		{
-			$message = substr($message, 0, self::MAX_MESSAGE_SIZE - 3) . '...';
+			$message = mb_substr($message, 0, self::MAX_MESSAGE_SIZE - 1) . self::ELLIPSIS;
 		}
-		if (isset($footer))
+		if (isset($footer) && mb_strlen($footer) > self::MAX_FOOTER_SIZE)
 		{
-			if (strlen($footer) > self::MAX_FOOTER_SIZE)
-			{
-				$footer = substr($footer, 0, self::MAX_FOOTER_SIZE - 3) . '...';
-			}
+			$footer = mb_substr($footer, 0, self::MAX_FOOTER_SIZE - 1) . self::ELLIPSIS;
 		}
 
 		// Place the message inside the JSON structure that Discord expects to receive at the REST endpoint.

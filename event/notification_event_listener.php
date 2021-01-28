@@ -28,6 +28,8 @@ class notification_event_listener implements EventSubscriberInterface
 	const EMOJI_USER	= '👥';
 	const EMOJI_BAN		= '🚫';
 
+	const ELLIPSIS = '…';
+
 	// These constants represent colors used for the Discord notification. The numbers are decimal representations of hexadecimal color codes.
 	const COLOR_BRIGHT_GREEN	= 2993970;
 	const COLOR_BRIGHT_BLUE		= 3580392;
@@ -939,11 +941,12 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		$footer = $this->remove_formatting($content);
+
 		// Truncate the content if it is too long and add '...' for the last three characters. The preview length will
 		// always be at least 10 characters so we don't need to worry about really short strings.
-		if (strlen($footer) > $preview_length)
+		if (mb_strlen($footer) > $preview_length)
 		{
-			$footer = substr($footer, 0, $preview_length - 3) . '...';
+			$footer = mb_substr($footer, 0, $preview_length - 3) . self::ELLIPSIS;
 		}
 
 		// Prepend text to the footer so that it's clear what content we are sharing in the footer
