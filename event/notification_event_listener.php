@@ -30,12 +30,12 @@ class notification_event_listener implements EventSubscriberInterface
 
 	const ELLIPSIS = '…';
 
-	// These constants represent colors used for the Discord notification. The numbers are decimal representations of hexadecimal color codes.
-	const COLOR_BRIGHT_GREEN	= 2993970;
-	const COLOR_BRIGHT_BLUE		= 3580392;
-	const COLOR_BRIGHT_RED		= 15217973;
-	const COLOR_BRIGHT_ORANGE	= 14050617;
-	const COLOR_BRIGHT_PURPLE	= 14038504;
+	// These constants represent colors used for the Discord notification
+	const COLOR_BRIGHT_GREEN	= 0x2DAF32;
+	const COLOR_BRIGHT_BLUE		= 0x36A1E8;
+	const COLOR_BRIGHT_RED		= 0xE83535;
+	const COLOR_BRIGHT_ORANGE	= 0xD66539;
+	const COLOR_BRIGHT_PURPLE	= 0xD635E8;
 
 	/** @var \phpbb\language\language */
 	protected $language;
