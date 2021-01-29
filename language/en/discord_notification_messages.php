@@ -31,6 +31,7 @@ $lang = array_merge($lang, array(
 	'DELETE_POST'				=> '%s Deleted post by user %s in the topic %s located in the forum %s', // %s == emoji, user, topic, forum
 	'LOCK_POST'					=> '%s The %s written by user %s in the topic titled %s in the %s forum has been locked', // %s == emoji, post, user, topic, forum
 	'UNLOCK_POST'				=> '%s The %s written by user %s in the topic titled %s in the %s forum has been unlocked', // %s == emoji, post, user, topic, forum
+	'APPROVE_POST'				=> '%s The %s written by user %s in the topic titled %s in the %s forum has been approved', // %s == emoji, post, user, topic, forum
 
 	// Topic Notifications
 	'CREATE_TOPIC'				=> '%s %s created a new topic titled %s in the %s forum', // %s == emoji, user, topic, forum
@@ -39,6 +40,7 @@ $lang = array_merge($lang, array(
 	'DELETE_TOPIC'				=> '%s Deleted the topic started by user %s titled \'%s\' containing %d posts in the forum %s', // %s/d == emoji, user, topic title, post count, forum
 	'LOCK_TOPIC'				=> '%s The topic titled %s in the %s forum started by user %s has been locked', // %s == emoji, topic, forum, user
 	'UNLOCK_TOPIC'				=> '%s The topic titled %s in the %s forum started by user %s has been unlocked', // %s == emoji, topic, forum, user
+	'APPROVE_TOPIC'				=> '%s The topic titled %s in the %s forum started by user %s has been approved', // %s == emoji, topic, forum, user
 
 	// User Notifications
 	'CREATE_USER'				=> '%s New user account created for %s', // %s == emoji, user

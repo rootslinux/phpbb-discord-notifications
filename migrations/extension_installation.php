@@ -95,6 +95,7 @@ class extension_installation extends \phpbb\db\migration\migration
 			array('config.add', array('discord_notification_type_post_delete', 1)),
 			array('config.add', array('discord_notification_type_post_lock', 1)),
 			array('config.add', array('discord_notification_type_post_unlock', 1)),
+			array('config.add', array('discord_notification_type_post_approve', 1)),
 
 			// Topic notifications
 			array('config.add', array('discord_notification_type_topic_create', 1)),
@@ -102,6 +103,7 @@ class extension_installation extends \phpbb\db\migration\migration
 			array('config.add', array('discord_notification_type_topic_delete', 1)),
 			array('config.add', array('discord_notification_type_topic_lock', 1)),
 			array('config.add', array('discord_notification_type_topic_unlock', 1)),
+			array('config.add', array('discord_notification_type_topic_approve', 1)),
 
 			// User notifications
 			array('config.add', array('discord_notification_type_user_create', 1)),

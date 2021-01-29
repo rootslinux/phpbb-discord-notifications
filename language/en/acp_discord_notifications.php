@@ -46,11 +46,13 @@ $lang = array_merge($lang, array(
 	'DN_POST_DELETE'				=> 'Post deleted',
 	'DN_POST_LOCK'					=> 'Post locked',
 	'DN_POST_UNLOCK'				=> 'Post unlocked',
+	'DN_POST_APPROVE'				=> 'Post approved',
 	'DN_TOPIC_CREATE'				=> 'Topic created',
 	'DN_TOPIC_UPDATE'				=> 'Topic updated',
 	'DN_TOPIC_DELETE'				=> 'Topic deleted',
 	'DN_TOPIC_LOCK'					=> 'Topic locked',
 	'DN_TOPIC_UNLOCK'				=> 'Topic unlocked',
+	'DN_TOPIC_APPROVE'				=> 'Topic approved',
 	'DN_USER_CREATE'				=> 'User created',
 	'DN_USER_DELETE'				=> 'User deleted',
 

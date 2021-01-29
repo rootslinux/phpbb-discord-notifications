@@ -111,12 +111,14 @@ class discord_notifications_module
 			'DN_POST_DELETE'			=> $this->config['discord_notification_type_post_delete'],
 			'DN_POST_LOCK'				=> $this->config['discord_notification_type_post_lock'],
 			'DN_POST_UNLOCK'			=> $this->config['discord_notification_type_post_unlock'],
+			'DN_POST_APPROVE'			=> $this->config['discord_notification_type_post_approve'],
 
 			'DN_TOPIC_CREATE'			=> $this->config['discord_notification_type_topic_create'],
 			'DN_TOPIC_UPDATE'			=> $this->config['discord_notification_type_topic_update'],
 			'DN_TOPIC_DELETE'			=> $this->config['discord_notification_type_topic_delete'],
 			'DN_TOPIC_LOCK'				=> $this->config['discord_notification_type_topic_lock'],
 			'DN_TOPIC_UNLOCK'			=> $this->config['discord_notification_type_topic_unlock'],
+			'DN_TOPIC_APPROVE'			=> $this->config['discord_notification_type_topic_approve'],
 
 			'DN_USER_CREATE'			=> $this->config['discord_notification_type_user_create'],
 			'DN_USER_DELETE'			=> $this->config['discord_notification_type_user_delete'],
@@ -212,12 +214,14 @@ class discord_notifications_module
 		$this->config->set('discord_notification_type_post_delete', $this->request->variable('dn_post_delete', 0));
 		$this->config->set('discord_notification_type_post_lock', $this->request->variable('dn_post_lock', 0));
 		$this->config->set('discord_notification_type_post_unlock', $this->request->variable('dn_post_unlock', 0));
+		$this->config->set('discord_notification_type_post_approve', $this->request->variable('dn_post_approve', 0));
 
 		$this->config->set('discord_notification_type_topic_create', $this->request->variable('dn_topic_create', 0));
 		$this->config->set('discord_notification_type_topic_update', $this->request->variable('dn_topic_update', 0));
 		$this->config->set('discord_notification_type_topic_delete', $this->request->variable('dn_topic_delete', 0));
 		$this->config->set('discord_notification_type_topic_lock', $this->request->variable('dn_topic_lock', 0));
 		$this->config->set('discord_notification_type_topic_unlock', $this->request->variable('dn_topic_unlock', 0));
+		$this->config->set('discord_notification_type_topic_approve', $this->request->variable('dn_topic_approve', 0));
 
 		$this->config->set('discord_notification_type_user_create', $this->request->variable('dn_user_create', 0));
 		$this->config->set('discord_notification_type_user_delete', $this->request->variable('dn_user_delete', 0));
