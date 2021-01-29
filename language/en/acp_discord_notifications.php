@@ -37,6 +37,7 @@ $lang = array_merge($lang, array(
 	'DN_CONNECT_TO_DESCRIPTION'     => 'Timeout in seconds to establish a connection to the Webhook endpoint.',
 	'DN_EXEC_TIMEOUT'               => 'Transfer timeout',
 	'DN_EXEC_TO_DESCRIPTION'        => 'Timeout in seconds for data transfer.',
+	'DN_TEST_SETTINGS'				=> 'Test Settings',
 
 	'DN_TYPE_SETTINGS'				=> 'Notification Types',
 	'DN_TYPE_DESCRIPTION'			=> 'Select which types of notifications should generate messages that get sent to Discord',

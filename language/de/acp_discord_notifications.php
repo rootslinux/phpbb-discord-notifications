@@ -37,6 +37,7 @@ $lang = array_merge($lang, array(
 	'DN_CONNECT_TO_DESCRIPTION'     => 'Zeit in Sekunden, die maximal auf einen Verbindungsaufbau gewartet wird.',
 	'DN_EXEC_TIMEOUT'               => 'Timeout Übertragung',
 	'DN_EXEC_TO_DESCRIPTION'        => 'Maximale Zeit in Sekunden, die die Datenübertragung dauern darf.',
+	'DN_TEST_SETTINGS'				=> 'Test',
 
 	'DN_TYPE_SETTINGS'				=> 'Benachrichtigungstypen',
 	'DN_TYPE_DESCRIPTION'			=> 'Wähle aus, welche Ereignisse eine Benachrichtigung auslösen sollen.',
