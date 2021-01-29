@@ -20,13 +20,14 @@
 		}
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=7.1",
+        "ext-curl": "*",
         "composer/installers": "~1.0"
     },
     "extra": {
         "display-name": "Discord Notifications",
         "soft-require": {
-            "phpbb/phpbb": ">=3.1.4,<3.2.0@dev"
+            "phpbb/phpbb": ">=3.3.0"
         }
     },
     "require-dev": {
