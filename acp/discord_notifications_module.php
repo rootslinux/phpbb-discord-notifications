@@ -78,9 +78,9 @@ class discord_notifications_module
 		// Used for sending test messages to Discord
 		$this->notification_service = $phpbb_container->get('roots.discordnotifications.notification_service');
 
-		$this->user->add_lang_ext('roots/discordnotifications', 'acp_discord_notifications');
+		$this->language->add_lang('acp_discord_notifications', 'roots/discordnotifications');
 		$this->tpl_name = 'acp_discord_notifications';
-		$this->page_title = $this->user->lang('ACP_DISCORD_NOTIFICATIONS_TITLE');
+		$this->page_title = $this->language->lang('ACP_DISCORD_NOTIFICATIONS_TITLE');
 
 		add_form_key(self::PAGE_FORM_NAME);
 
@@ -102,7 +102,7 @@ class discord_notifications_module
 			'DN_MASTER_ENABLE'			=> $this->config['discord_notifications_enabled'],
 			'DN_WEBHOOK_URL'			=> $this->config['discord_notifications_webhook_url'],
 			'DN_POST_PREVIEW_LENGTH'	=> $this->config['discord_notifications_post_preview_length'],
-			'DN_TEST_MESSAGE_TEXT'		=> $this->user->lang('DN_TEST_MESSAGE_TEXT'),
+			'DN_TEST_MESSAGE_TEXT'		=> $this->language->lang('DN_TEST_MESSAGE_TEXT'),
 			'DN_CONNECT_TIMEOUT'		=> $this->config['discord_notifications_connect_timeout'],
 			'DN_EXEC_TIMEOUT'			=> $this->config['discord_notifications_exec_timeout'],
 
@@ -137,21 +137,21 @@ class discord_notifications_module
 		// Check user inputs before attempting to send the message
 		if ($test_message == '')
 		{
-			trigger_error($this->user->lang('DN_TEST_BAD_MESSAGE') . adm_back_link($this->u_action), E_USER_WARNING);
+			trigger_error($this->language->lang('DN_TEST_BAD_MESSAGE') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 		if ($webhook_url == '' || !filter_var($webhook_url, FILTER_VALIDATE_URL))
 		{
-			trigger_error($this->user->lang('DN_TEST_BAD_WEBHOOK') . adm_back_link($this->u_action), E_USER_WARNING);
+			trigger_error($this->language->lang('DN_TEST_BAD_WEBHOOK') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 
 		$result = $this->notification_service->force_send_discord_notification($webhook_url, $test_message);
 		if ($result == true)
 		{
-			trigger_error($this->user->lang('DN_TEST_SUCCESS') . adm_back_link($this->u_action));
+			trigger_error($this->language->lang('DN_TEST_SUCCESS') . adm_back_link($this->u_action));
 		}
 		else
 		{
-			trigger_error($this->user->lang('DN_TEST_FAILURE') . adm_back_link($this->u_action), E_USER_WARNING);
+			trigger_error($this->language->lang('DN_TEST_FAILURE') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 	}
 
@@ -173,22 +173,22 @@ class discord_notifications_module
 		// If the master enable is set to on, a webhook URL is required
 		if ($master_enable == 1 && $webhook_url == '')
 		{
-			trigger_error($this->user->lang('DN_MASTER_WEBHOOK_REQUIRED') . adm_back_link($this->u_action), E_USER_WARNING);
+			trigger_error($this->language->lang('DN_MASTER_WEBHOOK_REQUIRED') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 		// Check that the webhook URL is a valid URL string if it is not empty
 		if ($webhook_url != '' && !filter_var($webhook_url, FILTER_VALIDATE_URL))
 		{
-			trigger_error($this->user->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
+			trigger_error($this->language->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 		// Verify that the post preview length is a numeric string, convert to an int and check the valid range
 		if (is_numeric($preview_length) == false)
 		{
-			trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
+			trigger_error($this->language->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 		$preview_length = (int)$preview_length;
 		if ($preview_length != 0 && ($preview_length < self::MIN_POST_PREVIEW_LENGTH || $preview_length > self::MAX_POST_PREVIEW_LENGTH))
 		{
-			trigger_error($this->user->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
+			trigger_error($this->language->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 
 		$connect_timeout = (int) $this->request->variable('dn_connect_to', 0);
@@ -251,7 +251,7 @@ class discord_notifications_module
 		// Destroy any cached discord notification data
 		$this->cache->destroy('roots_discord_notifications');
 
-		trigger_error($this->user->lang('DN_SETTINGS_SAVED') . adm_back_link($this->u_action));
+		trigger_error($this->language->lang('DN_SETTINGS_SAVED') . adm_back_link($this->u_action));
 	}
 
 	/**
