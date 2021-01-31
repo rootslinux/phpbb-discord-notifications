@@ -195,17 +195,17 @@ class notification_service
 	 */
 	public function query_user_name($user_id)
 	{
-		if (is_numeric($user_id) == false)
-		{
-			return null;
+		if (is_numeric($user_id)) {
+			$sql    = "SELECT username from " . USERS_TABLE . " WHERE user_id = " . $this->db->sql_escape($user_id);
+			$result = $this->db->sql_query($sql);
+			$data   = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+			if ($data)
+			{
+				return $data['username'];
+			}
 		}
-
-		$sql = "SELECT username from " . USERS_TABLE . " WHERE user_id = " . $this->db->sql_escape($user_id);
-		$result = $this->db->sql_query($sql);
-		$data = $this->db->sql_fetchrow($result);
-		$name = $data['username'];
-		$this->db->sql_freeresult($result);
-		return $name;
+		return null;
 	}
 
 	/**
