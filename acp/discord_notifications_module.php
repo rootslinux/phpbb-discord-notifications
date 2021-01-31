@@ -25,9 +25,6 @@ class discord_notifications_module
 	// The name for the form used for this page
 	const PAGE_FORM_NAME = 'acp_roots_discord_notifications';
 
-	// Inputs on the page for enabling/disabling a forum for notifications are all named with this prefix
-	const FORUM_INPUT_PREFIX = 'dn_forum_';
-
 	/** @var string */
 	public $page_title;
 
@@ -97,10 +94,11 @@ class discord_notifications_module
 		// Generate the dynamic HTML content for enabling/disabling forum notifications
 		$this->generate_forum_section();
 
+		$this->generate_webhook_section();
+
 		// Assign template values so that the page reflects the state of the extension settings
 		$this->template->assign_vars(array(
 			'DN_MASTER_ENABLE'			=> $this->config['discord_notifications_enabled'],
-			'DN_WEBHOOK_URL'			=> $this->config['discord_notifications_webhook_url'],
 			'DN_POST_PREVIEW_LENGTH'	=> $this->config['discord_notifications_post_preview_length'],
 			'DN_TEST_MESSAGE_TEXT'		=> $this->language->lang('DN_TEST_MESSAGE_TEXT'),
 			'DN_CONNECT_TIMEOUT'		=> $this->config['discord_notifications_connect_timeout'],
@@ -123,17 +121,41 @@ class discord_notifications_module
 			'DN_USER_CREATE'			=> $this->config['discord_notification_type_user_create'],
 			'DN_USER_DELETE'			=> $this->config['discord_notification_type_user_delete'],
 
+			'DN_DEFAULT_WEBHOOK'		=> $this->config['discord_notification_default_webhook'],
+
 			'U_ACTION'					=> $this->u_action,
 		));
 	}
 
-	/*
+	/**
+	 * Additional validation compared to `filter_var($url, FILTER_VALIDATE_URL)`:
+	 * Scheme must be "http" or "https".
+	 *
+	 * @param string $url
+	 * @return bool
+	 */
+	private function validate_url($url)
+	{
+		$info = parse_url($url);
+		if ($info === false || !isset($info['scheme'], $info['host'], $info['path'])) {
+			return false;
+		}
+		$scheme = strtolower($info['scheme']);
+		if ($scheme !== 'http' && $scheme !== 'https') {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Called when the user clicks the "Send Test Message" button on the page. Sends the content in the
 	 * Text Message input to Discord.
 	 */
 	private function process_send_test_message()
 	{
-		$webhook_url = $this->request->variable('dn_webhook_url', '');
+		global $table_prefix;
+
+		$webhook = $this->request->variable('dn_test_webhook', '');
 		$test_message = $this->request->variable('dn_test_message', '');
 
 		// Check user inputs before attempting to send the message
@@ -141,12 +163,17 @@ class discord_notifications_module
 		{
 			trigger_error($this->language->lang('DN_TEST_BAD_MESSAGE') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
-		if ($webhook_url == '' || !filter_var($webhook_url, FILTER_VALIDATE_URL))
+		if ($webhook == '')
 		{
 			trigger_error($this->language->lang('DN_TEST_BAD_WEBHOOK') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
 
-		$result = $this->notification_service->force_send_discord_notification($webhook_url, $test_message);
+		$sql = "SELECT url FROM {$table_prefix}discord_webhooks WHERE alias = '" . $this->db->sql_escape($webhook) . "'";
+		$result = $this->db->sql_query($sql);
+		$data = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+
+		$result = $this->notification_service->force_send_discord_notification($data['url'], $test_message);
 		if ($result == true)
 		{
 			trigger_error($this->language->lang('DN_TEST_SUCCESS') . adm_back_link($this->u_action));
@@ -157,11 +184,13 @@ class discord_notifications_module
 		}
 	}
 
-	/*
+	/**
 	 * Handles all error checking and database changes when the user hits the submit button on the ACP page.
 	 */
 	private function process_form_submit()
 	{
+		global $table_prefix;
+
 		if (!check_form_key(self::PAGE_FORM_NAME))
 		{
 			trigger_error('FORM_INVALID', E_USER_WARNING);
@@ -169,19 +198,8 @@ class discord_notifications_module
 
 		// Get form values for the main settings
 		$master_enable = $this->request->variable('dn_master_enable', 0);
-		$webhook_url = $this->request->variable('dn_webhook_url', '');
 		$preview_length = $this->request->variable('dn_post_preview_length', '');
 
-		// If the master enable is set to on, a webhook URL is required
-		if ($master_enable == 1 && $webhook_url == '')
-		{
-			trigger_error($this->language->lang('DN_MASTER_WEBHOOK_REQUIRED') . adm_back_link($this->u_action), E_USER_WARNING);
-		}
-		// Check that the webhook URL is a valid URL string if it is not empty
-		if ($webhook_url != '' && !filter_var($webhook_url, FILTER_VALIDATE_URL))
-		{
-			trigger_error($this->language->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
-		}
 		// Verify that the post preview length is a numeric string, convert to an int and check the valid range
 		if (is_numeric($preview_length) == false)
 		{
@@ -191,6 +209,52 @@ class discord_notifications_module
 		if ($preview_length != 0 && ($preview_length < self::MIN_POST_PREVIEW_LENGTH || $preview_length > self::MAX_POST_PREVIEW_LENGTH))
 		{
 			trigger_error($this->language->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
+		}
+
+		// Create new entry
+		$new_alias = $this->request->variable('dn_webhook_new_alias', '');
+		$new_url = $this->request->variable('dn_webhook_new_url', '');
+		if ($new_alias !== '' && $new_url !== '')
+		{
+			if (!filter_var($new_url, FILTER_VALIDATE_URL))
+			{
+				trigger_error($this->language->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
+			}
+			$sql = "INSERT INTO {$table_prefix}discord_webhooks(alias, url) VALUES('" . $this->db->sql_escape($new_alias) . "', '" . $this->db->sql_escape($new_url) . "')";
+			$this->db->sql_query($sql);
+		}
+
+		// Update existing entries
+		$webhook_configuration = $this->request->variable('dn_webhook', ['' => '']);
+		foreach ($webhook_configuration as $alias => $url)
+		{
+			if ($url === '')
+			{
+				$sql = "DELETE FROM {$table_prefix}discord_webhooks WHERE alias = '" . $this->db->sql_escape($alias) . "'";
+				$this->db->sql_query($sql);
+
+				$sql = "UPDATE " . FORUMS_TABLE . " SET discord_notifications = '' WHERE discord_notifications = '" . $this->db->sql_escape($alias) . "'";
+				$this->db->sql_query($sql);
+			} else
+			{
+				if (!$this->validate_url($url)) {
+					trigger_error($this->language->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
+				}
+				$sql = "UPDATE {$table_prefix}discord_webhooks SET url = '" . $this->db->sql_escape($url) . "' WHERE alias = '" . $this->db->sql_escape($alias) . "'";
+				$this->db->sql_query($sql);
+			}
+		}
+
+		// Update configuration per forum
+		$forum_configuration = $this->request->variable('dn_forum', [0 => '']);
+		foreach ($forum_configuration as $id => $value)
+		{
+			// Don't update deleted entries
+			if ($value === '' || $webhook_configuration[$value] !== '') {
+				$sql = "UPDATE " . FORUMS_TABLE . " SET discord_notifications = '" . $this->db->sql_escape($value) .
+					"' WHERE forum_id = " . $this->db->sql_escape($id);
+				$this->db->sql_query($sql);
+			}
 		}
 
 		$connect_timeout = (int) $this->request->variable('dn_connect_to', 0);
@@ -204,7 +268,6 @@ class discord_notifications_module
 		}
 
 		$this->config->set('discord_notifications_enabled', $master_enable);
-		$this->config->set('discord_notifications_webhook_url', $webhook_url);
 		$this->config->set('discord_notifications_post_preview_length', $preview_length);
 		$this->config->set('discord_notifications_connect_timeout', $connect_timeout);
 		$this->config->set('discord_notifications_exec_timeout', $exec_timeout);
@@ -226,29 +289,7 @@ class discord_notifications_module
 		$this->config->set('discord_notification_type_user_create', $this->request->variable('dn_user_create', 0));
 		$this->config->set('discord_notification_type_user_delete', $this->request->variable('dn_user_delete', 0));
 
-		// Set the discord_notifications_enabled in the forum table.
-		$forum_id_names = array(); // This array will be built up to contain {forum_id} => {input_name}
-
-		// First grab all variables in the submit request and match each against a regex to find the ones that are tied to a forum enabled setting.
-		$form_inputs = $this->request->variable_names();
-		foreach ($form_inputs as $input)
-		{
-			$matches = array();
-			$match = preg_match('/^' . self::FORUM_INPUT_PREFIX . '(\d+)$/', $input, $matches);
-			if ($match === 1)
-			{
-				$forum_id_names[$matches[1]] = $input;
-			}
-		}
-
-		// Grab all of the values for all of the forum inputs and update the row in the forum table
-		foreach ($forum_id_names as $id => $input_name)
-		{
-			$enabled = (int)$this->request->variable($input_name, 0);
-			$sql = "UPDATE " . FORUMS_TABLE . " SET discord_notifications_enabled = " . $this->db->sql_escape($enabled) . "WHERE forum_id = " . $this->db->sql_escape($id);
-			$this->db->sql_query($sql);
-			// TODO: It would be better to do this update in a single operation instead of once for each input inside this loop
-		}
+		$this->config->set('discord_notification_default_webhook', $this->request->variable('dn_webhook_default', ''));
 
 		// Log the settings change
 		$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'ACP_DISCORD_NOTIFICATIONS_LOG_UPDATE');
@@ -258,13 +299,31 @@ class discord_notifications_module
 		trigger_error($this->language->lang('DN_SETTINGS_SAVED') . adm_back_link($this->u_action));
 	}
 
+	private function generate_webhook_section()
+	{
+		global $table_prefix;
+
+		$sql = "SELECT alias, url FROM {$table_prefix}discord_webhooks ORDER BY alias";
+		$result = $this->db->sql_query($sql);
+
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$tpl_row = array(
+				'ALIAS'	=> $row['alias'],
+				'URL'	=> $row['url'],
+			);
+			$this->template->assign_block_vars('webhookrow', $tpl_row);
+		}
+		$this->db->sql_freeresult($result);
+	}
+
 	/**
 	 * Generates the section of the ACP page listing all of the forums, in order, with the radio button option
 	 * that allows the user to enable or disable discord notifications for that forum.
 	 */
 	private function generate_forum_section()
 	{
-		$sql = "SELECT forum_id, forum_type, forum_name, discord_notifications_enabled FROM " . FORUMS_TABLE . " ORDER BY left_id ASC";
+		$sql = "SELECT forum_id, forum_type, forum_name, discord_notifications FROM " . FORUMS_TABLE . " ORDER BY left_id ASC";
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result))
@@ -278,15 +337,14 @@ class discord_notifications_module
 				);
 				$this->template->assign_block_vars('forumrow', $tpl_row);
 			}
-			// Normal forums have a radio input with the value selected based on the value of the discord_notifications_enabled setting
 			else if ($row['forum_type'] == FORUM_POST)
 			{
 				// The labels for all the inputs are constructed based on the forum IDs to make it easy to know which
 				$tpl_row = array(
-							'S_IS_CAT'			=> false,
-							'FORUM_NAME'		=> $row['forum_name'],
-							'FORUM_ID'			=> self::FORUM_INPUT_PREFIX . $row['forum_id'],
-							'FORUM_DN_ENABLED'	=> $row['discord_notifications_enabled'],
+							'S_IS_CAT'		=> false,
+							'FORUM_NAME'	=> $row['forum_name'],
+							'FORUM_ID'		=> $row['forum_id'],
+							'ALIAS'			=> $row['discord_notifications'],
 						);
 				$this->template->assign_block_vars('forumrow', $tpl_row);
 			}

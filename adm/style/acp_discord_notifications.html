@@ -14,12 +14,6 @@
 				<label><input type="radio" class="radio" name="dn_master_enable" value="0" <!-- IF not DN_MASTER_ENABLE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
 		<dl>
-			<dt><label for="dn_webhook_url">{L_DN_WEBHOOK_URL}{L_COLON}</label><br /><span>{L_DN_WEBHOOK_DESCRIPTION}</span></dt>
-			<dd>
-				<input id="dn_webhook_url" name="dn_webhook_url" type="text" value="{{ DN_WEBHOOK_URL }}" size="100" maxlength="255" />
-			</dd>
-		</dl>
-		<dl>
 			<dt><label for="dn_post_preview_length">{L_DN_POST_PREVIEW_LENGTH}{L_COLON}</label><br /><span>{L_DN_POST_PREVIEW_DESCRIPTION}</span></dt>
 			<dd>
 				<input id="dn_post_preview_length" name="dn_post_preview_length" type="text" value="{{ DN_POST_PREVIEW_LENGTH }}" size="4" maxlength="4" />
@@ -40,6 +34,40 @@
 	</fieldset>
 
 	<fieldset>
+		<legend>{L_DN_WEBHOOK_SETTINGS}</legend>
+		<p>{L_DN_WEBHOOK_SETTINGS_DESCRIPTION}</p>
+		{% if loops.webhookrow %}
+			{% for webhook in loops.webhookrow %}
+				<dl>
+					<dt><label>{{ webhook.ALIAS }}</label></dt>
+					<dd>
+						<label><input type="text" size="100" maxlength="255" name="dn_webhook[{{ webhook.ALIAS }}]" value="{{ webhook.URL }}" /></label>
+					</dd>
+				</dl>
+			{% endfor %}
+		{% else %}
+			<p><strong>{L_DN_NO_WEBHOOKS}</strong></p>
+		{% endif %}
+	</fieldset>
+
+	<fieldset>
+		<legend>{L_DN_WEBHOOK_NEW}</legend>
+		<p>{L_DN_WEBHOOK_NEW_DESCRIPTION}</p>
+		<dl>
+			<dt><label for="dn_webhook_new_alias">{L_DN_WEBHOOK_NEW_ALIAS}{L_COLON}</label></dt>
+			<dd>
+				<input id="dn_webhook_new_alias" name="dn_webhook_new_alias" type="text" value="" size="100" maxlength="255" />
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="dn_webhook_new_url">{L_DN_WEBHOOK_NEW_URL}{L_COLON}</label></dt>
+			<dd>
+				<input id="dn_webhook_new_url" name="dn_webhook_new_url" type="text" value="" size="100" maxlength="255" />
+			</dd>
+		</dl>
+	</fieldset>
+
+	<fieldset>
 		<legend>{L_DN_TEST_SETTINGS}</legend>
 		<dl>
 			<dt><label for="dn_test_message">{L_DN_TEST_MESSAGE}{L_COLON}</label><br /><span>{L_DN_TEST_DESCRIPTION}</span></dt>
@@ -47,10 +75,25 @@
 				<input id="dn_test_message" name="dn_test_message" type="text" value="{{ DN_TEST_MESSAGE_TEXT }}" size="100" maxlength="255" />
 			</dd>
 		</dl>
+		{% if loops.webhookrow %}
+		<dl>
+			<dt><label for="dn_test_webhook">{L_DN_WEBHOOK_SELECT}{L_COLON}</label><br /></dt>
+			<dd>
+				<select id="dn_test_webhook" name="dn_test_webhook">
+					<option value="">{L_DN_WEBHOOK_SELECT}</option>
+					{% for webhook in loops.webhookrow %}
+					<option value="{{ webhook.ALIAS }}"{% if forumrow.ALIAS == webhook.ALIAS %} selected{% endif %}>{{ webhook.ALIAS }}</option>
+					{% endfor %}
+				</select>
+			</dd>
+		</dl>
 		<dl>
 			<dt><label for="action_send_test_message">{L_DN_SEND_TEST}{L_COLON}</label><br /><span>{L_DN_SEND_TEST_DESCRIPTION}</span></dt>
 			<dd><input class="button2" type="submit" id="action_send_test_message" name="action_send_test_message" value="{{ lang('DN_SEND_TEST') }}" /></dd>
 		</dl>
+		{% else %}
+		<p><strong>{L_DN_NO_WEBHOOKS}</strong></p>
+		{% endif %}
 	</fieldset>
 
 	<fieldset>
@@ -126,6 +169,17 @@
 			<dd><label><input type="radio" class="radio" name="dn_user_delete" value="1" <!-- IF DN_USER_DELETE -->checked="checked"<!-- ENDIF -->/> {L_YES}</label>
 				<label><input type="radio" class="radio" name="dn_user_delete" value="0" <!-- IF not DN_USER_DELETE -->checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 		</dl>
+		<dl>
+			<dt><label for="dn_webhook_default">{L_DN_WEBHOOK_DEFAULT}{L_COLON}</label><br /><span>{L_DN_WEBHOOK_DEFAULT_DESCRIPTION}</span></dt>
+			<dd>
+				<select id="dn_webhook_default" name="dn_webhook_default">
+					<option value="">({L_DISABLED})</option>
+					{% for webhook in loops.webhookrow %}
+					<option value="{{ webhook.ALIAS }}"{% if DN_DEFAULT_WEBHOOK == webhook.ALIAS %} selected{% endif %}>{{ webhook.ALIAS }}</option>
+					{% endfor %}
+				</select>
+			</dd>
+		</dl>
 	</fieldset>
 
 	<fieldset>
@@ -134,15 +188,17 @@
 		<!-- IF .forumrow -->
 			<!-- BEGIN forumrow -->
 				<!-- IF forumrow.S_IS_CAT -->
-					<dl>
-						<dt><label><u>{forumrow.FORUM_NAME}</u></label></dt>
-					</dl>
+					<p><strong>» {forumrow.FORUM_NAME}</strong></p>
 				<!-- ELSE -->
 					<dl>
-						<dt><label>{forumrow.FORUM_NAME}</label></dt>
+						<dt><label for="dn_forum_{{ forumrow.FORUM_ID }}">{forumrow.FORUM_NAME}</label></dt>
 						<dd>
-							<label><input type="radio" class="radio" name="{forumrow.FORUM_ID}" value="1" <!-- IF forumrow.FORUM_DN_ENABLED -->checked="checked"<!-- ENDIF --> /> {L_YES}</label>
-							<label><input type="radio" class="radio" name="{forumrow.FORUM_ID}" value="0" <!-- IF not forumrow.FORUM_DN_ENABLED -->checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+							<select id="dn_forum_{{ forumrow.FORUM_ID }}" name="dn_forum[{{ forumrow.FORUM_ID }}]">
+								<option value="">({L_DISABLED})</option>
+								{% for webhook in loops.webhookrow %}
+									<option value="{{ webhook.ALIAS }}"{% if forumrow.ALIAS == webhook.ALIAS %} selected{% endif %}>{{ webhook.ALIAS }}</option>
+								{% endfor %}
+							</select>
 						</dd>
 					</dl>
 				<!-- ENDIF -->
