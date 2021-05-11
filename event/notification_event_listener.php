@@ -293,7 +293,8 @@ class notification_event_listener implements EventSubscriberInterface
 
 		// Unfortunately the only useful data we get from this event is the topic ID. We have to run a custom query to retrieve the
 		// rest of the data that we are interested in.
-		$topic_id = (int)array_pop($event['topic_ids']);
+		$topics_ids = $event['topic_ids'];
+		$topic_id = (int)array_pop($topics_ids);
 		$query_data = $this->notification_service->query_topic_details($topic_id);
 
 		// Check for visibility of the topic. We don't send notifications for content that is hidden from normal users.
