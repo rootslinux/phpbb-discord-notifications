@@ -565,11 +565,13 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Construct the notification message using the post data.
-		$user_name = $data['user_name'] !== '' ? $data['user_name'] : $this->language->lang('UNKNOWN_USER');
+		$user_name = empty($data['user_name']) ? $this->language->lang('UNKNOWN_USER') : $data['user_name'];
 		$user_link = $this->generate_user_link($data['user_id'], $user_name);
-		$topic_title = $data['topic_title'] !== '' ? $data['topic_title'] : $this->language->lang('UNKNOWN_TOPIC');
+
+		$topic_title = empty($data['topic_title']) ? $this->language->lang('UNKNOWN_TOPIC') : $data['topic_title'];
 		$topic_link = $this->generate_topic_link($data['topic_id'], $topic_title);
-		$forum_name = $data['forum_name'] !== '' ? $data['forum_name'] : $this->language->lang('UNKNOWN_FORUM');
+
+		$forum_name = empty($data['forum_name']) ? $this->language->lang('UNKNOWN_FORUM') : $data['forum_name'];
 		$forum_link = $this->generate_forum_link($data['forum_id'], $forum_name);
 
 		$message = sprintf($this->language->lang('DELETE_POST'),

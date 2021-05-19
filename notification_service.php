@@ -173,7 +173,7 @@ class notification_service
 		$sql = "SELECT topic_title from " . TOPICS_TABLE . " WHERE topic_id = " . $this->db->sql_escape($topic_id);
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
-		$title = $data['topic_title'];
+		$title = $data ? $data['topic_title'] : null;
 		$this->db->sql_freeresult($result);
 		return $title;
 	}
