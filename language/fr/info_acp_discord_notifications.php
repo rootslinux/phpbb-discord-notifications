@@ -45,5 +45,8 @@ $lang = array_merge($lang, array(
 	'ACP_DISCORD_NOTIFICATIONS_TITLE'			=> 'Paramètres',
 
 	// ACP Logs
-	'ACP_DISCORD_NOTIFICATIONS_LOG_UPDATE'		=> '<strong>Paramètres des notifications Discord modifiées</strong>',
+	'ACP_DISCORD_NOTIFICATIONS_LOG_UPDATE'		=> 'Paramètres des notifications Discord modifiées',
+	'ACP_DISCORD_NOTIFICATIONS_WEBHOOK_ERROR'	=> 'Discord Webhook returned HTTP status code %d',
+	'ACP_DISCORD_NOTIFICATIONS_CURL_ERROR'		=> 'Discord Webhook cURL error code %d',
+	'ACP_DISCORD_NOTIFICATIONS_JSON_ERROR'		=> 'Discord JSON encode error: %s',
 ));
