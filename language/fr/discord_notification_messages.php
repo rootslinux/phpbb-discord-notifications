@@ -52,6 +52,7 @@ $lang = array_merge($lang, array(
 	'DELETE_POST'				=> '%s Message supprimé de l’auteur « %s » dans le sujet « %s » du forum « %s ».', // %s == emoji, user, topic, forum
 	'LOCK_POST'					=> '%s Le message « %s » publié par le membre « %s » dans le sujet intitulé « %s » du forum « %s » a été verrouillé.', // %s == emoji, post, user, topic, forum
 	'UNLOCK_POST'				=> '%s Le message « %s » publié par le membre « %s » dans le sujet intitulé « %s » du forum « %s » a été déverrouillé.', // %s == emoji, post, user, topic, forum
+	'APPROVE_POST'				=> '%s Le message « %s » publié par le membre « %s » dans le sujet intitulé « %s » du forum « %s » a été approuvé', // %s == emoji, post, user, topic, forum
 
 	// Topic Notifications
 	'CREATE_TOPIC'				=> '%s %s a publié un nouveau sujet intitulé « %s » dans le forum « %s ».', // %s == emoji, user, topic, forum
@@ -60,6 +61,7 @@ $lang = array_merge($lang, array(
 	'DELETE_TOPIC'				=> '%s Sujet supprimé de l’auteur « %s », intitulé « %s », contenant %d messages dans le forum « %s ».', // %s/d == emoji, user, topic title, post count, forum
 	'LOCK_TOPIC'				=> '%s Le sujet intitulé « %s » dans le forum « %s » et dont l’auteur est « %s » a été verrouillé.', // %s == emoji, topic, forum, user
 	'UNLOCK_TOPIC'				=> '%s Le sujet intitulé « %s » dans le forum « %s » et dont l’auteur est « %s » a été déverrouillé.', // %s == emoji, topic, forum, user
+	'APPROVE_TOPIC'				=> '%s Le sujet intitulé « %s » dans le forum « %s » et dont l’auteur est « %s » a été approuvé', // %s == emoji, topic, forum, user
 
 	// User Notifications
 	'CREATE_USER'				=> '%s Nouveau compte utilisateur créé pour le membre « %s ».', // %s == emoji, user
