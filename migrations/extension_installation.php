@@ -83,7 +83,6 @@ class extension_installation extends \phpbb\db\migration\migration
 			array('config.add', array('discord_notifications_connect_timeout', 2)),
 			array('config.add', array('discord_notifications_exec_timeout', 2)),
 
-
 			// These configurations represent the various types of notifications that can be sent, which can be individually enabled or disabled.
 			// Upon installation, every notification type is enabled by default.
 

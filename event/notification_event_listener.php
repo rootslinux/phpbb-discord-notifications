@@ -204,11 +204,11 @@ class notification_event_listener implements EventSubscriberInterface
 		{
 			$this->notify_topic_created($post_data, $webhook_url);
 		}
-		elseif ($event['mode'] == 'reply' || $event['mode'] == 'quote') // New post
+		else if ($event['mode'] == 'reply' || $event['mode'] == 'quote') // New post
 		{
 			$this->notify_post_created($post_data, $webhook_url);
 		}
-		elseif ($event['mode'] == 'edit' || $event['mode'] == 'edit_topic' || $event['mode'] == 'edit_first_post' || $event['mode'] == 'edit_last_post') // Edit existing post
+		else if ($event['mode'] == 'edit' || $event['mode'] == 'edit_topic' || $event['mode'] == 'edit_first_post' || $event['mode'] == 'edit_last_post') // Edit existing post
 		{
 			// If the post that was edited is the first one in the topic, we consider this a topic update event.
 			if ($event['data']['post_id'] == $event['data']['topic_first_post_id'])
@@ -294,7 +294,7 @@ class notification_event_listener implements EventSubscriberInterface
 		// Unfortunately the only useful data we get from this event is the topic ID. We have to run a custom query to retrieve the
 		// rest of the data that we are interested in.
 		$topics_ids = $event['topic_ids'];
-		$topic_id = (int)array_pop($topics_ids);
+		$topic_id = (int) array_pop($topics_ids);
 		$query_data = $this->notification_service->query_topic_details($topic_id);
 
 		// Check for visibility of the topic. We don't send notifications for content that is hidden from normal users.
@@ -427,7 +427,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$user_data['user_id'] = $event['user_id'];
 			$user_data['user_name'] = $event['user_row']['username'];
 		}
-		elseif ($event['activated'] == 1)
+		else if ($event['activated'] == 1)
 		{
 			$user_data['user_id'] = array_pop($event['user_id_ary']);
 			$user_name = $this->notification_service->query_user_name($user_data['user_id']);
@@ -477,7 +477,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_CREATE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -510,7 +511,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_UPDATE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -560,7 +562,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_DELETE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -602,7 +605,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_LOCK;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -632,7 +636,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_UNLOCK;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -662,7 +667,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_CREATE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -747,7 +753,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_UPDATE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -796,7 +803,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_DELETE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -826,7 +834,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_LOCK;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -855,7 +864,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_UNLOCK;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -885,7 +895,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_USER;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -914,7 +925,8 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_USER;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false) {
+		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		{
 			return;
 		}
 
@@ -928,7 +940,8 @@ class notification_event_listener implements EventSubscriberInterface
 				$emoji, $user_name
 			);
 		}
-		else {
+		else
+		{
 			$deleted_users_text = '';
 			$and = $this->language->lang('AND');
 			$comma = $this->language->lang('CONJ');
@@ -936,12 +949,12 @@ class notification_event_listener implements EventSubscriberInterface
 			{
 				$deleted_users_text = array_pop($data) . " $and " . array_pop($data);
 			}
-			elseif (count($data) == 3)
+			else if (count($data) == 3)
 			{
 				$deleted_users_text = array_pop($data) . "$comma " . array_pop($data) . "$comma $and " . array_pop($data);
 			}
 			// If more than three users were deleted, we display three user names and then the number of additional deletions
-			elseif (count($data) > 3)
+			else if (count($data) > 3)
 			{
 				$deleted_users_text = array_pop($data) . "$comma " . array_pop($data) . "$comma " . array_pop($data) . "$comma $and " . count($data);
 				// Singular vs plural case check

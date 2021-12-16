@@ -92,7 +92,8 @@ class notification_service
 		$data = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 
-		if ($data['discord_notifications']) {
+		if ($data['discord_notifications'])
+		{
 			$sql = "SELECT url FROM {$table_prefix}discord_webhooks WHERE alias = '" . $this->db->sql_escape($data['discord_notifications']) . "'";
 			$result = $this->db->sql_query($sql);
 			$data2 = $this->db->sql_fetchrow($result);
@@ -212,7 +213,8 @@ class notification_service
 	 */
 	public function query_user_name($user_id)
 	{
-		if (is_numeric($user_id)) {
+		if (is_numeric($user_id))
+		{
 			$sql    = "SELECT username from " . USERS_TABLE . " WHERE user_id = " . $this->db->sql_escape($user_id);
 			$result = $this->db->sql_query($sql);
 			$data   = $this->db->sql_fetchrow($result);
@@ -248,7 +250,8 @@ class notification_service
 		if (is_null($webhook_url))
 		{
 			$default = $this->config['discord_notification_default_webhook'];
-			if ($default) {
+			if ($default)
+			{
 				$sql = "SELECT url FROM {$table_prefix}discord_webhooks WHERE alias = '" . $this->db->sql_escape($default) . "'";
 				$result = $this->db->sql_query($sql);
 				$data   = $this->db->sql_fetchrow($result);
@@ -275,7 +278,7 @@ class notification_service
 			return false;
 		}
 
-		return $this->execute_discord_webhook($discord_webhook_url, self::DEFAULT_COLOR, $message, NULL);
+		return $this->execute_discord_webhook($discord_webhook_url, self::DEFAULT_COLOR, $message, null);
 	}
 
 	/**
@@ -347,7 +350,8 @@ class notification_service
 			"description" => $message
 		];
 
-		if (isset($footer)) {
+		if (isset($footer))
+		{
 			$embed["footer"] = ["text" => $footer];
 		}
 
@@ -356,7 +360,8 @@ class notification_service
 		];
 
 		$json = \json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-		if ($json === false) {
+		if ($json === false)
+		{
 			$this->log->add('admin', ANONYMOUS, '127.0.0.1', 'ACP_DISCORD_NOTIFICATIONS_JSON_ERROR', time(), [json_last_error_msg()]);
 			return false;
 		}
@@ -376,12 +381,15 @@ class notification_service
 		curl_close($h);
 
 		// TODO: Retry?
-		if ($error == 0) {
-			if ($status < 200 || $status > 299) {
+		if ($error == 0)
+		{
+			if ($status < 200 || $status > 299)
+			{
 				$this->log->add('admin', ANONYMOUS, '127.0.0.1', 'ACP_DISCORD_NOTIFICATIONS_WEBHOOK_ERROR', time(), [$status]);
 				return false;
 			}
-		} else {
+		} else
+		{
 			$this->log->add('admin', ANONYMOUS, '127.0.0.1', 'ACP_DISCORD_NOTIFICATIONS_CURL_ERROR', time(), [$error]);
 			return false;
 		}
