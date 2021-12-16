@@ -8,7 +8,7 @@
  *
  */
 
-namespace roots\discordnotifications\tests\dbal;
+namespace mober\discordnotifications\tests\dbal;
 
 // Need to include functions.php to use phpbb_version_compare in this test
 require_once __DIR__ . '/../../../../../includes/functions.php';
@@ -17,7 +17,7 @@ class simple_test extends \phpbb_database_test_case
 {
 	static protected function setup_extensions()
 	{
-		return array('roots/discordnotifications');
+		return array('mober/discordnotifications');
 	}
 
 	/** @var \phpbb\db\driver\driver_interface */

@@ -2,17 +2,17 @@ imports:
     - { resource: parameters.yml }
 
 services:
-    roots.discordnotifications.notification_service:
-        class: roots\discordnotifications\notification_service
+    mober.discordnotifications.notification_service:
+        class: mober\discordnotifications\notification_service
         arguments:
             - '@config'
             - '@dbal.conn'
             - '@log'
 
-    roots.discordnotifications.listener:
-        class: roots\discordnotifications\event\notification_event_listener
+    mober.discordnotifications.listener:
+        class: mober\discordnotifications\event\notification_event_listener
         arguments:
             - '@language'
-            - '@roots.discordnotifications.notification_service'
+            - '@mober.discordnotifications.notification_service'
         tags:
             - { name: event.listener }

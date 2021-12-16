@@ -6,7 +6,7 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-namespace roots\discordnotifications\acp;
+namespace mober\discordnotifications\acp;
 
 /**
  * Discord Notifications ACP module info.
@@ -16,12 +16,12 @@ class discord_notifications_info
 	public function module()
 	{
 		return array(
-			'filename'	=> '\roots\discordnotifications\acp\discord_notifications_module',
+			'filename'	=> '\mober\discordnotifications\acp\discord_notifications_module',
 			'title'		=> 'ACP_DISCORD_NOTIFICATIONS',
 			'modes'		=> array(
 				'settings'	=> array(
 					'title'	=> 'ACP_DISCORD_NOTIFICATIONS_TITLE',
-					'auth'	=> 'ext_roots/discordnotifications && acl_a_board',
+					'auth'	=> 'ext_mober/discordnotifications && acl_a_board',
 					'cat'	=> array('ACP_DISCORD_NOTIFICATIONS')
 				),
 			),

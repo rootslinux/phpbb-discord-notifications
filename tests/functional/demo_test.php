@@ -8,7 +8,7 @@
  *
  */
 
-namespace roots\discordnotifications\tests\functional;
+namespace mober\discordnotifications\tests\functional;
 
 /**
  * @group functional
@@ -17,6 +17,6 @@ class demo_test extends \phpbb_functional_test_case
 {
 	static protected function setup_extensions()
 	{
-		return array('roots/discordnotifications');
+		return array('mober/discordnotifications');
 	}
 }

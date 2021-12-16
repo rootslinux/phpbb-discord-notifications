@@ -6,7 +6,7 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-namespace roots\discordnotifications\acp;
+namespace mober\discordnotifications\acp;
 
 /**
  * Discord Notifications ACP module.
@@ -23,7 +23,7 @@ class discord_notifications_module
 	const MAX_POST_PREVIEW_LENGTH = 2000;
 
 	// The name for the form used for this page
-	const PAGE_FORM_NAME = 'acp_roots_discord_notifications';
+	const PAGE_FORM_NAME = 'acp_mober_discord_notifications';
 
 	/** @var string */
 	public $page_title;
@@ -49,7 +49,7 @@ class discord_notifications_module
 	/** @var \phpbb\log\log */
 	protected $log;
 
-	/** @var \roots\discordnotifications\notification_service */
+	/** @var \mober\discordnotifications\notification_service */
 	protected $notification_service;
 
 	/** @var \phpbb\request\request */
@@ -73,9 +73,9 @@ class discord_notifications_module
 		$this->template = $phpbb_container->get('template');
 		$this->user = $phpbb_container->get('user');
 		// Used for sending test messages to Discord
-		$this->notification_service = $phpbb_container->get('roots.discordnotifications.notification_service');
+		$this->notification_service = $phpbb_container->get('mober.discordnotifications.notification_service');
 
-		$this->language->add_lang('acp_discord_notifications', 'roots/discordnotifications');
+		$this->language->add_lang('acp_discord_notifications', 'mober/discordnotifications');
 		$this->tpl_name = 'acp_discord_notifications';
 		$this->page_title = $this->language->lang('ACP_DISCORD_NOTIFICATIONS_TITLE');
 
@@ -294,7 +294,7 @@ class discord_notifications_module
 		// Log the settings change
 		$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'ACP_DISCORD_NOTIFICATIONS_LOG_UPDATE');
 		// Destroy any cached discord notification data
-		$this->cache->destroy('roots_discord_notifications');
+		$this->cache->destroy('mober_discord_notifications');
 
 		trigger_error($this->language->lang('DN_SETTINGS_SAVED') . adm_back_link($this->u_action));
 	}

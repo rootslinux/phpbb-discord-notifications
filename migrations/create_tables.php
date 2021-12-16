@@ -6,13 +6,13 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-namespace roots\discordnotifications\migrations;
+namespace mober\discordnotifications\migrations;
 
 class create_tables extends \phpbb\db\migration\migration
 {
 	static public function depends_on()
 	{
-		return array('\roots\discordnotifications\migrations\extension_installation');
+		return array('\mober\discordnotifications\migrations\extension_installation');
 	}
 
 	/**

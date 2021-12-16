@@ -6,7 +6,7 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-namespace roots\discordnotifications\event;
+namespace mober\discordnotifications\event;
 
 /**
  * @ignore
@@ -40,23 +40,23 @@ class notification_event_listener implements EventSubscriberInterface
 	/** @var \phpbb\language\language */
 	protected $language;
 
-	/** @var \roots\discordnotifications\notification_service */
+	/** @var \mober\discordnotifications\notification_service */
 	protected $notification_service;
 
 	/**
 	 * Constructor
 	 *
 	 * @param \phpbb\language\language                         $language
-	 * @param \roots\discordnotifications\notification_service $notification_service
+	 * @param \mober\discordnotifications\notification_service $notification_service
 	 * @access public
 	 */
-	public function __construct(\phpbb\language\language $language, \roots\discordnotifications\notification_service $notification_service)
+	public function __construct(\phpbb\language\language $language, \mober\discordnotifications\notification_service $notification_service)
 	{
 		$this->language = $language;
 		$this->notification_service = $notification_service;
 
 		// Add notifications text from the langauge file
-		$this->language->add_lang('discord_notification_messages', 'roots/discordnotifications');
+		$this->language->add_lang('discord_notification_messages', 'mober/discordnotifications');
 	}
 
 	/**

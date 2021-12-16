@@ -6,7 +6,7 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-namespace roots\discordnotifications\migrations;
+namespace mober\discordnotifications\migrations;
 
 /**
  * These migrations handle all database changes necessary for installation or removal of
@@ -120,7 +120,7 @@ class extension_installation extends \phpbb\db\migration\migration
 				'acp',
 				'ACP_DISCORD_NOTIFICATIONS',
 				array(
-					'module_basename'	=> '\roots\discordnotifications\acp\discord_notifications_module',
+					'module_basename'	=> '\mober\discordnotifications\acp\discord_notifications_module',
 					'modes'				=> array('settings'),
 				),
 			)),

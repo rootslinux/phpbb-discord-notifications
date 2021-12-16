@@ -1,11 +1,11 @@
 {
-    "name": "roots/discordnotifications",
+    "name": "mober/discordnotifications",
     "type": "phpbb-extension",
     "description": "Publishes forum event notifications to a Discord server channel",
-    "homepage": "https://github.com/rootslinux/phpbb-discord-notifications",
-    "version": "2.0.0",
+    "homepage": "https://github.com/m-ober/phpbb-discord-notifications",
+    "version": "3.0.0",
     "keywords": ["phpbb", "extension", "discord"],
-    "time": "2018-10-14",
+    "time": "2021-12-16",
     "license": "GPL-2.0-only",
     "authors": [
         {

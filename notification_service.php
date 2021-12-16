@@ -6,7 +6,7 @@
  * @license GNU General Public License, version 2 (GPL-2.0)
  */
 
-namespace roots\discordnotifications;
+namespace mober\discordnotifications;
 
 /**
  * Contains the core logic for formatting and sending notification message to Discord.
