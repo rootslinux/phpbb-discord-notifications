@@ -1,5 +1,7 @@
 # phpbb-discord-notifications
 
+[![Build Status](https://github.com/m-ober/phpbb-discord-notifications/workflows/Tests/badge.svg)](https://github.com/m-ober/phpbb-discord-notifications/actions)
+
 A phpBB extension that publishes notification messages to a Discord channel when certain events occur on a phpBB board. The intent of this extension is meant to announce content changes on a forum to a community residing on a Discord server. It is not intended as a compliment to the announcements found within the phpBB admin or moderator control panels. See the [wiki](https://github.com/rootslinux/phpbb-discord-notifications/wiki) for additional information.
 
 ## Installation
