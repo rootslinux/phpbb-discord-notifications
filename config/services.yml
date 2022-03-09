@@ -14,5 +14,6 @@ services:
         arguments:
             - '@language'
             - '@mober.discordnotifications.notification_service'
+            - '%core.php_ext%'
         tags:
             - { name: event.listener }

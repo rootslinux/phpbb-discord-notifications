@@ -43,17 +43,25 @@ class notification_event_listener implements EventSubscriberInterface
 	/** @var \mober\discordnotifications\notification_service */
 	protected $notification_service;
 
+	/** @var string php file extension  */
+	protected $php_ext;
+
 	/**
 	 * Constructor
 	 *
 	 * @param \phpbb\language\language                         $language
 	 * @param \mober\discordnotifications\notification_service $notification_service
+	 * @param string                                           $php_ext
 	 * @access public
 	 */
-	public function __construct(\phpbb\language\language $language, \mober\discordnotifications\notification_service $notification_service)
-	{
+	public function __construct(
+		\phpbb\language\language $language,
+		\mober\discordnotifications\notification_service $notification_service,
+		$php_ext
+	) {
 		$this->language = $language;
 		$this->notification_service = $notification_service;
+		$this->php_ext = $php_ext;
 
 		// Add notifications text from the langauge file
 		$this->language->add_lang('discord_notification_messages', 'mober/discordnotifications');
@@ -259,17 +267,17 @@ class notification_event_listener implements EventSubscriberInterface
 
 		// Fetch the forum name, topic title, and user name using the respective IDs.
 		$forum_name = $this->notification_service->query_forum_name($post_data['forum_id']);
-		if ($forum_name != null)
+		if ($forum_name)
 		{
 			$post_data['forum_name'] = $forum_name;
 		}
 		$topic_title = $this->notification_service->query_topic_title($post_data['topic_id']);
-		if ($topic_title != null)
+		if ($topic_title)
 		{
 			$post_data['topic_title'] = $topic_title;
 		}
 		$user_name = $this->notification_service->query_user_name($post_data['user_id']);
-		if ($user_name != null)
+		if ($user_name)
 		{
 			$post_data['user_name'] = $user_name;
 		}
@@ -1034,7 +1042,7 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function generate_forum_link($forum_id, $text)
 	{
-		$url = generate_board_url() . '/viewforum.php?f=' . $forum_id;
+		$url = generate_board_url() . '/viewforum.' . $this->php_ext . '?f=' . $forum_id;
 		$url = $this->reformat_link_url($url);
 		$text = $this->reformat_link_text($text);
 		return sprintf('[%s](%s)', $text, $url);
@@ -1050,7 +1058,7 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function generate_post_link($topic_id, $post_id, $text)
 	{
-		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id . '&p=' . $post_id . '#p' . $post_id;
+		$url = generate_board_url() . '/viewtopic.' . $this->php_ext . '?t=' . $topic_id . '&p=' . $post_id . '#p' . $post_id;
 		$url = $this->reformat_link_url($url);
 		$text = $this->reformat_link_text($text);
 		return sprintf('[%s](%s)', $text, $url);
@@ -1065,7 +1073,7 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function generate_topic_link($topic_id, $text)
 	{
-		$url = generate_board_url() . '/viewtopic.php?t=' . $topic_id;
+		$url = generate_board_url() . '/viewtopic.' . $this->php_ext . '?t=' . $topic_id;
 		$url = $this->reformat_link_url($url);
 		$text = $this->reformat_link_text($text);
 		return sprintf('[%s](%s)', $text, $url);
@@ -1080,7 +1088,7 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function generate_user_link($user_id, $text)
 	{
-		$url = generate_board_url() . '/memberlist.php?mode=viewprofile&u=' . $user_id;
+		$url = generate_board_url() . '/memberlist.' . $this->php_ext . '?mode=viewprofile&u=' . $user_id;
 		$url = $this->reformat_link_url($url);
 		$text = $this->reformat_link_text($text);
 		return sprintf('[%s](%s)', $text, $url);

@@ -57,13 +57,7 @@ class notification_service
 	 */
 	public function is_notification_type_enabled($notification_type)
 	{
-		// Also check the global extension enabled setting. We don't generate any notifications if this is disabled
-		if ($this->config['discord_notifications_enabled'] == 1 && $this->config[$notification_type] == 1)
-		{
-			return true;
-		}
-
-		return false;
+		return $this->config['discord_notifications_enabled'] == 1 && $this->config[$notification_type] == 1;
 	}
 
 	/**
@@ -87,7 +81,7 @@ class notification_service
 		}
 
 		// Query the forum table where forum notification settings are stored
-		$sql = "SELECT discord_notifications FROM " . FORUMS_TABLE . " WHERE forum_id = " . $this->db->sql_escape($forum_id);
+		$sql = "SELECT discord_notifications FROM " . FORUMS_TABLE . " WHERE forum_id = " . (int) $forum_id;
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -120,7 +114,7 @@ class notification_service
 	 * Retrieves the name of a forum from the database when given an ID
 	 *
 	 * @param int $forum_id The ID of the forum to query
-	 * @return null|string The name of the forum, or NULL if not found
+	 * @return string|false The name of the forum, or false if not found
 	 */
 	public function query_forum_name($forum_id)
 	{
@@ -129,12 +123,11 @@ class notification_service
 			return null;
 		}
 
-		$sql = "SELECT forum_name from " . FORUMS_TABLE . " WHERE forum_id = " . $this->db->sql_escape($forum_id);
+		$sql = "SELECT forum_name from " . FORUMS_TABLE . " WHERE forum_id = " . (int) $forum_id;
 		$result = $this->db->sql_query($sql);
-		$data = $this->db->sql_fetchrow($result);
-		$name = $data['forum_name'];
+		$data = $this->db->sql_fetchfield('forum_name');
 		$this->db->sql_freeresult($result);
-		return $name;
+		return $data;
 	}
 
 	/**
@@ -150,7 +143,7 @@ class notification_service
 			return null;
 		}
 
-		$sql = "SELECT post_subject from " . POSTS_TABLE . " WHERE post_id = " . $this->db->sql_escape($post_id);
+		$sql = "SELECT post_subject from " . POSTS_TABLE . " WHERE post_id = " . (int) $post_id;
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
 		$subject = $data['post_subject'];
@@ -162,7 +155,7 @@ class notification_service
 	 * Retrieves the title of a topic from the database when given an ID
 	 *
 	 * @param int $topic_id The ID of the topic to query
-	 * @return null|string The name of the topic, or NULL if not found
+	 * @return string|false The name of the topic, or false if not found
 	 */
 	public function query_topic_title($topic_id)
 	{
@@ -171,12 +164,11 @@ class notification_service
 			return null;
 		}
 
-		$sql = "SELECT topic_title from " . TOPICS_TABLE . " WHERE topic_id = " . $this->db->sql_escape($topic_id);
+		$sql = "SELECT topic_title from " . TOPICS_TABLE . " WHERE topic_id = " . (int) $topic_id;
 		$result = $this->db->sql_query($sql);
-		$data = $this->db->sql_fetchrow($result);
-		$title = $data ? $data['topic_title'] : null;
+		$data = $this->db->sql_fetchfield('topic_title');
 		$this->db->sql_freeresult($result);
-		return $title;
+		return $data;
 	}
 
 	/**
@@ -197,7 +189,7 @@ class notification_service
 				f.forum_id, f.forum_name,
 				t.topic_id, t.topic_title, t.topic_poster, t.topic_first_post_id, t.topic_first_poster_name, t.topic_posts_approved, t.topic_visibility
 				FROM " . FORUMS_TABLE . " f, " . TOPICS_TABLE . " t
-				WHERE t.forum_id = f.forum_id and t.topic_id = " . $this->db->sql_escape($topic_id);
+				WHERE t.forum_id = f.forum_id and t.topic_id = " . (int) $topic_id;
 		$result = $this->db->sql_query($sql);
 		$data = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
@@ -209,22 +201,20 @@ class notification_service
 	 * Retrieves the name of a user from the database when given an ID
 	 *
 	 * @param int $user_id The ID of the user to query
-	 * @return null|string The name of the user, or NULL if not found
+	 * @return string|false The name of the user, or false if not found
 	 */
 	public function query_user_name($user_id)
 	{
-		if (is_numeric($user_id))
+		if (is_numeric($user_id) == false)
 		{
-			$sql    = "SELECT username from " . USERS_TABLE . " WHERE user_id = " . $this->db->sql_escape($user_id);
-			$result = $this->db->sql_query($sql);
-			$data   = $this->db->sql_fetchrow($result);
-			$this->db->sql_freeresult($result);
-			if ($data)
-			{
-				return $data['username'];
-			}
+			return false;
 		}
-		return null;
+
+		$sql = "SELECT username from " . USERS_TABLE . " WHERE user_id = " . (int) $user_id;
+		$result = $this->db->sql_query($sql);
+		$data = $this->db->sql_fetchfield('username');
+		$this->db->sql_freeresult($result);
+		return $data;
 	}
 
 	/**

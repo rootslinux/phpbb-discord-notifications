@@ -256,7 +256,7 @@ class discord_notifications_module
 			if ($value === '' || $webhook_configuration[$value] !== '')
 			{
 				$sql = "UPDATE " . FORUMS_TABLE . " SET discord_notifications = '" . $this->db->sql_escape($value) .
-					"' WHERE forum_id = " . $this->db->sql_escape($id);
+					"' WHERE forum_id = " . (int) $id;
 				$this->db->sql_query($sql);
 			}
 		}

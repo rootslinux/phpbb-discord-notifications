@@ -17,7 +17,7 @@ class extension_installation extends \phpbb\db\migration\migration
 {
 	static public function depends_on()
 	{
-		return array('\phpbb\db\migration\data\v31x\v314');
+		return array('\phpbb\db\migration\data\v330\v330');
 	}
 
 	/**
