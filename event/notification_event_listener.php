@@ -58,7 +58,8 @@ class notification_event_listener implements EventSubscriberInterface
 		\phpbb\language\language $language,
 		\mober\discordnotifications\notification_service $notification_service,
 		$php_ext
-	) {
+	)
+	{
 		$this->language = $language;
 		$this->notification_service = $notification_service;
 		$this->php_ext = $php_ext;
