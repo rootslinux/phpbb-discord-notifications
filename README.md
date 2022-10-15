@@ -6,9 +6,15 @@ A phpBB extension that publishes notification messages to a Discord channel when
 
 ## Installation
 
-Copy the extension to phpBB/ext/roots/discordnotifications
+Copy the extension to `phpBB/ext/mober/discordnotifications`
 
 Go to "ACP" > "Customise" > "Extensions" and enable the "Discord Notifications" extension.
+
+## Additional languages
+
+There are translations provided by other users which are not distributed with this extension:
+
+https://www.phpbb.com/customise/db/extension/discord_notifications_2/support/topic/237636
 
 ## Tests and Continuous Integration
 
