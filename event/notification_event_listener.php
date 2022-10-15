@@ -1028,8 +1028,7 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function remove_formatting($text)
 	{
-		$text = strip_tags($text);
-		$text = preg_replace('|[[\/\!]*?[^\[\]]*?]|si', '', $text);
+		strip_bbcode($text);
 		$text = html_entity_decode($text, ENT_COMPAT);
 		return $text;
 	}
