@@ -1011,8 +1011,8 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function reformat_link_text($text)
 	{
-		$text = str_replace("[", "(", $text);
-		$text = str_replace("]", ")", $text);
+		$text = strtr($text, ['[' => '\\[']);
+		$text = strtr($text, [']' => '\\]']);
 		$text = html_entity_decode($text, ENT_COMPAT);
 		return $text;
 	}
