@@ -501,9 +501,9 @@ class notification_event_listener implements EventSubscriberInterface
 		);
 
 		// Generate a post preview if necessary
-		$footer = $this->generate_footer_text($this->language->lang('PREVIEW'), $data['content']);
+		$preview = $this->format_text_for_discord($data['content']);
 
-		$this->notification_service->send_discord_notification($color, $message, $footer, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('PREVIEW'), $preview, null, $webhook_url);
 	}
 
 	/**
@@ -548,13 +548,13 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// If we allow previews and an edit reason was given, add that information in the footer
-		$footer = null;
+		$preview = null;
 		if (isset($data['edit_reason']) && $data['edit_reason'] !== '')
 		{
-			$footer = $this->generate_footer_text($this->language->lang('REASON'), $data['edit_reason']);
+			$preview = $this->format_text_for_discord($data['edit_reason']);
 		}
 
-		$this->notification_service->send_discord_notification($color, $message, $footer, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('REASON'), $preview, null, $webhook_url);
 	}
 
 	/**
@@ -591,13 +591,13 @@ class notification_event_listener implements EventSubscriberInterface
 		);
 
 		// If there was a reason specified for the delete, include that in the message footer.
-		$footer = null;
+		$preview = null;
 		if (is_string($data['delete_reason']) && $data['delete_reason'] !== '')
 		{
-			$footer = $this->generate_footer_text($this->language->lang('REASON'), $data['delete_reason']);
+			$preview = $this->format_text_for_discord($data['delete_reason']);
 		}
 
-		$this->notification_service->send_discord_notification($color, $message, $footer, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('REASON'), $preview, null, $webhook_url);
 	}
 
 	/**
@@ -628,7 +628,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $post_link, $user_link, $topic_link, $forum_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
 	}
 
 	/**
@@ -659,7 +659,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $post_link, $user_link, $topic_link, $forum_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
 	}
 
 	/**
@@ -690,9 +690,9 @@ class notification_event_listener implements EventSubscriberInterface
 		);
 
 		// Generates a topic preview if necessary
-		$footer = $this->generate_footer_text($this->language->lang('PREVIEW'), $data['content']);
+		$preview = $this->format_text_for_discord($data['content']);
 
-		$this->notification_service->send_discord_notification($color, $message, $footer, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('PREVIEW'), $preview, null, $webhook_url);
 	}
 
 	/**
@@ -716,9 +716,9 @@ class notification_event_listener implements EventSubscriberInterface
 		);
 
 		// Generates a topic preview if necessary
-		$footer = $this->generate_footer_text($this->language->lang('PREVIEW'), $data['post_text']);
+		$preview = $this->format_text_for_discord($data['post_text']);
 
-		$this->notification_service->send_discord_notification($color, $message, $footer, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('PREVIEW'), $preview, null, $webhook_url);
 	}
 
 	/**
@@ -743,9 +743,9 @@ class notification_event_listener implements EventSubscriberInterface
 		);
 
 		// Generate a post preview if necessary
-		$footer = $this->generate_footer_text($this->language->lang('PREVIEW'), $data['post_text']);
+		$preview = $this->format_text_for_discord($data['post_text']);
 
-		$this->notification_service->send_discord_notification($color, $message, $footer, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('PREVIEW'), $preview, null, $webhook_url);
 	}
 
 	/**
@@ -789,13 +789,13 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// If an edit reason was given, add that information in the footer
-		$footer = null;
+		$preview = null;
 		if (isset($data['edit_reason']) && $data['edit_reason'] !== '')
 		{
-			$footer = $this->generate_footer_text($this->language->lang('REASON'), $data['edit_reason']);
+			$preview = $this->format_text_for_discord($data['edit_reason']);
 		}
 
-		$this->notification_service->send_discord_notification($color, $message, $footer, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('REASON'), $preview, null, $webhook_url);
 	}
 
 	/**
@@ -826,7 +826,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $user_link, $topic_title, $data['topic_post_count'], $forum_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
 	}
 
 	/**
@@ -856,7 +856,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $topic_link, $forum_link, $user_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
 	}
 
 	/**
@@ -886,7 +886,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $topic_link, $forum_link, $user_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
 	}
 
 	/**
@@ -1097,12 +1097,11 @@ class notification_event_listener implements EventSubscriberInterface
 	/**
 	 * Formats and prepares text to be placed in the footer of a notification message.
 	 *
-	 * @param string $prepend_text Text to add before the content
 	 * @param string $content      The raw text to place in the footer
 	 * @return string A string meeting the configuration requirements for a footer, or NULL if a footer should not be
 	 *                generated at all.
 	 */
-	private function generate_footer_text($prepend_text, $content)
+	private function format_text_for_discord($content)
 	{
 		$preview_length = $this->notification_service->get_post_preview_length();
 		if ($preview_length == 0)
@@ -1119,8 +1118,6 @@ class notification_event_listener implements EventSubscriberInterface
 			$footer = mb_substr($footer, 0, $preview_length - mb_strlen(self::ELLIPSIS)) . self::ELLIPSIS;
 		}
 
-		// Prepend text to the footer so that it's clear what content we are sharing in the footer
-		$footer = $prepend_text . $footer;
 		return $footer;
 	}
 }

@@ -227,7 +227,7 @@ class notification_service
 	 * @param null|string $footer  Text to place in the footer of the message. Optional.
 	 * @param null|string $webhook_url
 	 */
-	public function send_discord_notification($color, $message, $footer = null, $webhook_url = null)
+	public function send_discord_notification($color, $message, $title = null, $preview = null, $footer = null, $webhook_url = null)
 	{
 		global $table_prefix;
 
@@ -249,7 +249,7 @@ class notification_service
 				$webhook_url = $data['url'];
 			}
 		}
-		$this->execute_discord_webhook($webhook_url, $color, $message, $footer);
+		$this->execute_discord_webhook($webhook_url, $color, $message, $title, $preview, $footer);
 	}
 
 	/**
@@ -268,7 +268,7 @@ class notification_service
 			return false;
 		}
 
-		return $this->execute_discord_webhook($discord_webhook_url, self::DEFAULT_COLOR, $message, null);
+		return $this->execute_discord_webhook($discord_webhook_url, self::DEFAULT_COLOR, $message, null, null, null);
 	}
 
 	/**
@@ -281,11 +281,14 @@ class notification_service
 	 * @param string      $color               Color to set for the message. Should be a positive non-zero integer
 	 *                                         representing a hex color code.
 	 * @param string      $message             The message text to send. Must be a non-empty string.
-	 * @param null|string $footer              The text to place in the footer. Optional. Must be a non-empty string.
+	 * @param string      $title               Title of the preview (for example "Preview" or "Reason"). Optional.
+	 * @param string      $preview             Content of the preview. Optional.
+	 * @param string      $footer              The text to place in the footer. Optional.
 	 * @return bool indicating whether the message transmission resulted in success or failure.
 	 * @see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
+	 * @see https://discord.com/developers/docs/resources/channel#embed-object
 	 */
-	private function execute_discord_webhook($discord_webhook_url, $color, $message, $footer = null)
+	private function execute_discord_webhook($discord_webhook_url, $color, $message, $title, $preview, $footer)
 	{
 		if (isset($discord_webhook_url) == false || $discord_webhook_url === '')
 		{
@@ -343,6 +346,22 @@ class notification_service
 		if (isset($footer))
 		{
 			$embed["footer"] = ["text" => $footer];
+		}
+
+		if (isset($title) && isset($preview))
+		{
+			$title = trim($title);
+			$preview = trim($preview);
+			if ($title !== '' && $preview !== '')
+			{
+				$embed['fields'] = [
+					[
+						'name'   => $title,
+						'value'  => $preview,
+						'inline' => false
+					]
+				];
+			}
 		}
 
 		$payload = [
