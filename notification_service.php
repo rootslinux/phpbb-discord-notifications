@@ -339,6 +339,7 @@ class notification_service
 		// Place the message inside the JSON structure that Discord expects to receive at the REST endpoint.
 
 		$embed = [
+			"timestamp"   => date('c', time()),
 			"color"       => $color,
 			"description" => $message
 		];
