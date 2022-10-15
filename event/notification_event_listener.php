@@ -503,7 +503,7 @@ class notification_event_listener implements EventSubscriberInterface
 		// Generate a post preview if necessary
 		$preview = $this->format_text_for_discord($data['content']);
 
-		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('PREVIEW'), $preview, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url, $this->language->lang('PREVIEW'), $preview);
 	}
 
 	/**
@@ -554,7 +554,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$preview = $this->format_text_for_discord($data['edit_reason']);
 		}
 
-		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('REASON'), $preview, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url, $this->language->lang('REASON'), $preview);
 	}
 
 	/**
@@ -597,7 +597,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$preview = $this->format_text_for_discord($data['delete_reason']);
 		}
 
-		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('REASON'), $preview, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url, $this->language->lang('REASON'), $preview);
 	}
 
 	/**
@@ -628,7 +628,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $post_link, $user_link, $topic_link, $forum_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url);
 	}
 
 	/**
@@ -659,7 +659,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $post_link, $user_link, $topic_link, $forum_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url);
 	}
 
 	/**
@@ -692,7 +692,7 @@ class notification_event_listener implements EventSubscriberInterface
 		// Generates a topic preview if necessary
 		$preview = $this->format_text_for_discord($data['content']);
 
-		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('PREVIEW'), $preview, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url, $this->language->lang('PREVIEW'), $preview);
 	}
 
 	/**
@@ -718,7 +718,7 @@ class notification_event_listener implements EventSubscriberInterface
 		// Generates a topic preview if necessary
 		$preview = $this->format_text_for_discord($data['post_text']);
 
-		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('PREVIEW'), $preview, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url, $this->language->lang('PREVIEW'), $preview);
 	}
 
 	/**
@@ -745,7 +745,7 @@ class notification_event_listener implements EventSubscriberInterface
 		// Generate a post preview if necessary
 		$preview = $this->format_text_for_discord($data['post_text']);
 
-		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('PREVIEW'), $preview, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url, $this->language->lang('PREVIEW'), $preview);
 	}
 
 	/**
@@ -795,7 +795,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$preview = $this->format_text_for_discord($data['edit_reason']);
 		}
 
-		$this->notification_service->send_discord_notification($color, $message, $this->language->lang('REASON'), $preview, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url, $this->language->lang('REASON'), $preview);
 	}
 
 	/**
@@ -826,7 +826,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $user_link, $topic_title, $data['topic_post_count'], $forum_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url);
 	}
 
 	/**
@@ -856,7 +856,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $topic_link, $forum_link, $user_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url);
 	}
 
 	/**
@@ -886,7 +886,7 @@ class notification_event_listener implements EventSubscriberInterface
 			$emoji, $topic_link, $forum_link, $user_link
 		);
 
-		$this->notification_service->send_discord_notification($color, $message, null, null, null, $webhook_url);
+		$this->notification_service->send_discord_notification($color, $message, $webhook_url);
 	}
 
 	/**

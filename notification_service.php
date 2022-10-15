@@ -224,10 +224,10 @@ class notification_service
 	 *
 	 * @param string      $color   The color to use in the notification (decimal value of a hexadecimal RGB code)
 	 * @param string      $message The message text to send.
-	 * @param null|string $footer  Text to place in the footer of the message. Optional.
 	 * @param null|string $webhook_url
+	 * @param null|string $footer  Text to place in the footer of the message. Optional.
 	 */
-	public function send_discord_notification($color, $message, $title = null, $preview = null, $footer = null, $webhook_url = null)
+	public function send_discord_notification($color, $message, $webhook_url = null, $title = null, $preview = null, $footer = null)
 	{
 		global $table_prefix;
 
