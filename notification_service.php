@@ -268,7 +268,7 @@ class notification_service
 			return false;
 		}
 
-		return $this->execute_discord_webhook($discord_webhook_url, self::DEFAULT_COLOR, $message, null, null, null);
+		return $this->execute_discord_webhook($discord_webhook_url, self::DEFAULT_COLOR, $message);
 	}
 
 	/**
@@ -288,7 +288,7 @@ class notification_service
 	 * @see https://discordapp.com/developers/docs/resources/webhook#execute-webhook
 	 * @see https://discord.com/developers/docs/resources/channel#embed-object
 	 */
-	private function execute_discord_webhook($discord_webhook_url, $color, $message, $title, $preview, $footer)
+	private function execute_discord_webhook($discord_webhook_url, $color, $message, $title = null, $preview = null, $footer = null)
 	{
 		if (isset($discord_webhook_url) == false || $discord_webhook_url === '')
 		{
