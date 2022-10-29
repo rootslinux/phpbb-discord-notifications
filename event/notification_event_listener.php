@@ -1116,7 +1116,7 @@ class notification_event_listener implements EventSubscriberInterface
 		// always be at least 10 characters so we don't need to worry about really short strings.
 		if (mb_strlen($footer) > $preview_length)
 		{
-			$footer = mb_substr($footer, 0, $preview_length - 3) . self::ELLIPSIS;
+			$footer = mb_substr($footer, 0, $preview_length - mb_strlen(self::ELLIPSIS)) . self::ELLIPSIS;
 		}
 
 		// Prepend text to the footer so that it's clear what content we are sharing in the footer
