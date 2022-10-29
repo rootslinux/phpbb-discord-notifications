@@ -997,10 +997,11 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function reformat_link_url($url)
 	{
-		$url = str_replace(" ", "%20", $url);
-		$url = str_replace("(", "%28", $url);
-		$url = str_replace(")", "%29", $url);
-		return $url;
+		return strtr($url, [
+			' ' => '%20',
+			'(' => '%28',
+			')' => '%29'
+		]);
 	}
 
 	/**
