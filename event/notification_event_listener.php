@@ -1105,21 +1105,32 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function format_text_for_discord($content)
 	{
+		global $phpbb_container;
+
 		$preview_length = $this->notification_service->get_post_preview_length();
 		if ($preview_length == 0)
 		{
 			return null;
 		}
 
-		$footer = $this->remove_formatting($content);
+		/** @var \phpbb\textformatter\s9e\utils $text_formatter_utils */
+		$text_formatter_utils = $phpbb_container->get('text_formatter.utils');
+
+		$content_without_quotes = $text_formatter_utils->remove_bbcode(
+			$content,
+			'quote',
+			0
+		);
+
+		$preview = $this->remove_formatting($content_without_quotes);
 
 		// Truncate the content if it is too long and add '...' for the last three characters. The preview length will
 		// always be at least 10 characters so we don't need to worry about really short strings.
-		if (mb_strlen($footer) > $preview_length)
+		if (mb_strlen($preview) > $preview_length)
 		{
-			$footer = mb_substr($footer, 0, $preview_length - mb_strlen(self::ELLIPSIS)) . self::ELLIPSIS;
+			$preview = mb_substr($preview, 0, $preview_length - mb_strlen(self::ELLIPSIS)) . self::ELLIPSIS;
 		}
 
-		return $footer;
+		return $preview;
 	}
 }
