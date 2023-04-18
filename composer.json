@@ -1,36 +1,46 @@
 {
-    "name": "mober/discordnotifications",
-    "type": "phpbb-extension",
-    "description": "Publishes forum event notifications to a Discord server channel",
-    "homepage": "https://github.com/m-ober/phpbb-discord-notifications",
-    "version": "3.0.4",
-    "keywords": ["phpbb", "extension", "discord"],
-    "time": "2021-12-16",
-    "license": "GPL-2.0-only",
-    "authors": [
-        {
-            "name": "Tyler Olsen",
-            "homepage": "https://github.com/rootslinux",
-            "role": "Lead Developer"
-        },
+	"name": "mober/discordnotifications",
+	"type": "phpbb-extension",
+	"description": "Publishes forum event notifications to a Discord server channel",
+	"homepage": "https://github.com/m-ober/phpbb-discord-notifications",
+	"version": "3.0.4",
+	"keywords": [
+		"phpbb",
+		"extension",
+		"discord"
+	],
+	"time": "2021-12-16",
+	"license": "GPL-2.0-only",
+	"authors": [
+		{
+			"name": "Tyler Olsen",
+			"homepage": "https://github.com/rootslinux",
+			"role": "Lead Developer"
+		},
 		{
 			"name": "Micha Ober",
 			"homepage": "https://github.com/m-ober",
 			"role": "Developer"
 		}
-    ],
-    "require": {
-        "php": ">=7.1",
-        "ext-curl": "*",
-        "composer/installers": "~1.0"
-    },
-    "extra": {
-        "display-name": "Discord Notifications",
-        "soft-require": {
-            "phpbb/phpbb": ">=3.3.0"
-        }
-    },
-    "require-dev": {
-        "phing/phing": "~2.17"
-    }
+	],
+	"require": {
+		"php": ">=7.1",
+		"ext-curl": "*",
+		"composer/installers": "~1.0"
+	},
+	"extra": {
+		"display-name": "Discord Notifications",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.3.0"
+		}
+	},
+	"require-dev": {
+		"phing/phing": "~2.17"
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true
+		},
+		"prepend-autoloader": false
+	}
 }
