@@ -191,7 +191,7 @@
 					<p><strong>» {{ forum.FORUM_NAME }}</strong></p>
 				{% else %}
 					<dl>
-						<dt><label for="dn_forum_{{ forum.FORUM_ID }}">{{ forum.FORUM_NAME }}</label></dt>
+						<dt><i>{{ forum.PARENTS }}</i><label for="dn_forum_{{ forum.FORUM_ID }}">{{ forum.FORUM_NAME }}</label></dt>
 						<dd>
 							<select id="dn_forum_{{ forum.FORUM_ID }}" name="dn_forum[{{ forum.FORUM_ID }}]">
 								<option value="">({{ lang('DISABLED') }})</option>
