@@ -329,7 +329,15 @@ class discord_notifications_module
 	 */
 	private function generate_forum_section()
 	{
-		$sql = "SELECT forum_id, forum_type, forum_name, forum_parents, discord_notifications FROM " . FORUMS_TABLE . " ORDER BY left_id ASC";
+		global $phpbb_root_path, $phpEx;
+		if (!function_exists('get_forum_parents'))
+		{
+			include($phpbb_root_path . 'includes/functions_display.' . $phpEx);
+		}
+
+		$sql = "SELECT forum_id, forum_type, forum_name, left_id, right_id, parent_id, forum_parents, discord_notifications
+			FROM " . FORUMS_TABLE . "
+			ORDER BY left_id ASC";
 		$result = $this->db->sql_query($sql);
 
 		while ($row = $this->db->sql_fetchrow($result))
@@ -352,10 +360,16 @@ class discord_notifications_module
 							'FORUM_NAME'	=> $row['forum_name'],
 							'FORUM_ID'		=> $row['forum_id'],
 							'ALIAS'			=> $row['discord_notifications'],
-							'PARENTS'			=> '',
+							'PARENTS'		=> '',
 						);
-				$parents = unserialize($row['forum_parents']);
-				if (is_array($parents)) foreach ($parents as $parent) $tpl_row['PARENTS'] .= $parent[0] . ' -> ';
+				$parents = get_forum_parents($row);
+				if (is_array($parents))
+				{
+					foreach ($parents as $parent)
+					{
+						$tpl_row['PARENTS'] .= $parent[0] . ' &rarr; ';
+					}
+				}
 				$this->template->assign_block_vars('forumrow', $tpl_row);
 			}
 			// Other forum types (links) are ignored
