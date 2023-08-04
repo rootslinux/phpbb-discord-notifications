@@ -438,7 +438,7 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 		else if ($event['activated'] == 1)
 		{
-			$user_data['user_id'] = array_pop($event['user_id_ary']);
+			$user_data['user_id'] = array_slice($event['user_id_ary'], -1)[0];
 			$user_name = $this->notification_service->query_user_name($user_data['user_id']);
 			$user_data['user_name'] = ($user_name != null) ? $user_name : $this->language->lang('UNKNOWN_USER');
 		}
