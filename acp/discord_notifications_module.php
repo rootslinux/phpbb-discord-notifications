@@ -200,7 +200,8 @@ class discord_notifications_module
 		}
 
 		$delete_alias = $this->request->variable('action_delete_alias',  ['' => ''], true);
-		foreach ($delete_alias as $alias => $url) {
+		foreach ($delete_alias as $alias => $url)
+		{
 			$sql = "DELETE FROM {$table_prefix}discord_webhooks WHERE alias = '" . $this->db->sql_escape($alias) . "'";
 			$this->db->sql_query($sql);
 
@@ -253,7 +254,8 @@ class discord_notifications_module
 		// Update existing entries
 		$webhook_configuration = $this->request->variable('dn_webhook', ['' => ''], true);
 		// Validate all entries before updating
-		foreach ($webhook_configuration as $url) {
+		foreach ($webhook_configuration as $url)
+		{
 			if (!$this->validate_url($url))
 			{
 				trigger_error($this->language->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
