@@ -86,6 +86,10 @@ class discord_notifications_module
 		{
 			$this->process_send_test_message();
 		}
+		else if ($this->request->is_set_post('action_delete_alias'))
+		{
+			$this->process_delete_alias();
+		}
 		else if ($this->request->is_set_post('submit'))
 		{
 			$this->process_form_submit();
@@ -186,6 +190,26 @@ class discord_notifications_module
 		}
 	}
 
+	private function process_delete_alias()
+	{
+		global $table_prefix;
+
+		if (!check_form_key(self::PAGE_FORM_NAME))
+		{
+			trigger_error('FORM_INVALID', E_USER_WARNING);
+		}
+
+		$delete_alias = $this->request->variable('action_delete_alias',  ['' => '']);
+		foreach ($delete_alias as $alias => $url) {
+			$sql = "DELETE FROM {$table_prefix}discord_webhooks WHERE alias = '" . $this->db->sql_escape($alias) . "'";
+			$this->db->sql_query($sql);
+
+			$sql = "UPDATE " . FORUMS_TABLE . " SET discord_notifications = '' WHERE discord_notifications = '" . $this->db->sql_escape($alias) . "'";
+			$this->db->sql_query($sql);
+		}
+		trigger_error($this->language->lang('DN_SETTINGS_SAVED') . adm_back_link($this->u_action));
+	}
+
 	/**
 	 * Handles all error checking and database changes when the user hits the submit button on the ACP page.
 	 */
@@ -228,24 +252,17 @@ class discord_notifications_module
 
 		// Update existing entries
 		$webhook_configuration = $this->request->variable('dn_webhook', ['' => '']);
+		// Validate all entries before updating
+		foreach ($webhook_configuration as $url) {
+			if (!$this->validate_url($url))
+			{
+				trigger_error($this->language->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
+			}
+		}
 		foreach ($webhook_configuration as $alias => $url)
 		{
-			if ($url === '')
-			{
-				$sql = "DELETE FROM {$table_prefix}discord_webhooks WHERE alias = '" . $this->db->sql_escape($alias) . "'";
-				$this->db->sql_query($sql);
-
-				$sql = "UPDATE " . FORUMS_TABLE . " SET discord_notifications = '' WHERE discord_notifications = '" . $this->db->sql_escape($alias) . "'";
-				$this->db->sql_query($sql);
-			} else
-			{
-				if (!$this->validate_url($url))
-				{
-					trigger_error($this->language->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
-				}
-				$sql = "UPDATE {$table_prefix}discord_webhooks SET url = '" . $this->db->sql_escape($url) . "' WHERE alias = '" . $this->db->sql_escape($alias) . "'";
-				$this->db->sql_query($sql);
-			}
+			$sql = "UPDATE {$table_prefix}discord_webhooks SET url = '" . $this->db->sql_escape($url) . "' WHERE alias = '" . $this->db->sql_escape($alias) . "'";
+			$this->db->sql_query($sql);
 		}
 
 		// Update configuration per forum

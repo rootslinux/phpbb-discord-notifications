@@ -40,7 +40,7 @@ $lang = array_merge($lang, array(
 	'DN_TEST_SETTINGS'				=> 'Test',
 
 	'DN_WEBHOOK_SETTINGS'			=> 'Einträge Bearbeiten',
-	'DN_WEBHOOK_SETTINGS_DESCRIPTION' => 'Hier können bestehende Einträge bearbeitet werden. Ein Eintrag wird gelöscht, wenn das URL-Feld leer ist.',
+	'DN_WEBHOOK_SETTINGS_DESCRIPTION' => 'Hier können bestehende Einträge bearbeitet oder gelöscht werden.',
 	'DN_WEBHOOK_NEW'				=> 'Neuen Eintrag anlegen',
 	'DN_WEBHOOK_NEW_DESCRIPTION'	=> 'Hier kann ein neuer Eintrag angelegt werden. Die URL muss vollständig sein und mit "http" oder "https" beginnen.',
 	'DN_WEBHOOK_NEW_ALIAS'			=> 'Neuer Alias',

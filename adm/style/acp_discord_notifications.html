@@ -39,9 +39,10 @@
 		{% if loops.webhookrow %}
 			{% for webhook in loops.webhookrow %}
 				<dl>
-					<dt><label>{{ webhook.ALIAS }}</label></dt>
+					<dt><label for="dn_webhook_{{ webhook.ALIAS }}">{{ webhook.ALIAS }}</label></dt>
 					<dd>
-						<label><input type="text" size="100" maxlength="255" name="dn_webhook[{{ webhook.ALIAS }}]" value="{{ webhook.URL }}" /></label>
+						<input type="text" size="100" maxlength="255" id="dn_webhook_{{ webhook.ALIAS }}" name="dn_webhook[{{ webhook.ALIAS }}]" value="{{ webhook.URL }}" />
+						<input type="submit" name="action_delete_alias[{{ webhook.ALIAS }}]" value="{{ lang('DELETE') }}" class="button2" onclick="return confirm('{{ lang('CONFIRM_OPERATION') }}');">
 					</dd>
 				</dl>
 			{% endfor %}
