@@ -176,7 +176,7 @@ class discord_notifications_module
 		$this->db->sql_freeresult($result);
 
 		$result = $this->notification_service->force_send_discord_notification($data['url'], $test_message);
-		if ($result == true)
+		if ($result)
 		{
 			trigger_error($this->language->lang('DN_TEST_SUCCESS') . adm_back_link($this->u_action));
 		}
@@ -203,7 +203,7 @@ class discord_notifications_module
 		$preview_length = $this->request->variable('dn_post_preview_length', '');
 
 		// Verify that the post preview length is a numeric string, convert to an int and check the valid range
-		if (is_numeric($preview_length) == false)
+		if (!is_numeric($preview_length))
 		{
 			trigger_error($this->language->lang('DN_POST_PREVIEW_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 		}
