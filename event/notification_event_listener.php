@@ -356,13 +356,13 @@ class notification_event_listener implements EventSubscriberInterface
 		$lock_data = array();
 		$lock_data['forum_id'] = $event['data'][$id]['forum_id'];
 		$lock_data['forum_name'] = $event['data'][$id]['forum_name'];
-		$lock_data['post_id'] = $event['data'][$id]['post_id'];
-		$lock_data['post_subject'] = $event['data'][$id]['post_subject'];
+		$lock_data['post_id'] = $event['data'][$id]['post_id'] ?? ''; // only used for post_[un]lock events
+		$lock_data['post_subject'] = $event['data'][$id]['post_subject'] ?? ''; // only used for post_[un]lock events
 		$lock_data['topic_id'] = $event['data'][$id]['topic_id'];
 		$lock_data['topic_title'] = $event['data'][$id]['topic_title'];
 		// Two sets of user data captured: one for the post (if applicable) and one for the user that started the topic
-		$lock_data['post_user_id'] = $event['data'][$id]['poster_id'];
-		$lock_data['post_user_name'] = $event['data'][$id]['username'];
+		$lock_data['post_user_id'] = $event['data'][$id]['poster_id'] ?? ''; // only used for post_[un]lock events
+		$lock_data['post_user_name'] = $event['data'][$id]['username'] ?? ''; // only used for post_[un]lock events
 		$lock_data['topic_user_id'] = $event['data'][$id]['topic_poster'];
 		$lock_data['topic_user_name'] = $event['data'][$id]['topic_first_poster_name'];
 
