@@ -218,7 +218,7 @@ class discord_notifications_module
 		$new_url = $this->request->variable('dn_webhook_new_url', '');
 		if ($new_alias !== '' && $new_url !== '')
 		{
-			if (!filter_var($new_url, FILTER_VALIDATE_URL))
+			if (!$this->validate_url($new_url))
 			{
 				trigger_error($this->language->lang('DN_WEBHOOK_URL_INVALID') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
