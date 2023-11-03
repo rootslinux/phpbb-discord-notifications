@@ -368,9 +368,9 @@ class notification_event_listener implements EventSubscriberInterface
 		$lock_data['topic_user_name'] = $event['data'][$id]['topic_first_poster_name'];
 
 		// If the forum the post was made in does not have notifications enabled or the topic/poar is not visible, do nothing more.
-		$topic_visibile = $event['data'][$id]['topic_visibility'] == 1 ? true : false;
+		$topic_visibile = $event['data'][$id]['topic_visibility'] == 1;
 		$webhook_url = $this->notification_service->get_forum_notification_url($lock_data['forum_id']);
-		if (!$webhook_url || $topic_visibile == false)
+		if (!$webhook_url || !$topic_visibile)
 		{
 			return;
 		}
@@ -486,7 +486,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_CREATE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -520,7 +520,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_UPDATE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -571,7 +571,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_DELETE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -614,7 +614,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_LOCK;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -645,7 +645,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_UNLOCK;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -676,7 +676,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_CREATE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -762,7 +762,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_UPDATE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -812,7 +812,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_DELETE;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -843,7 +843,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_LOCK;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -873,7 +873,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_UNLOCK;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -904,7 +904,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_USER;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
@@ -934,7 +934,7 @@ class notification_event_listener implements EventSubscriberInterface
 		$emoji = self::EMOJI_USER;
 
 		// Verify that this notification type is enabled. If not, we have nothing further to do.
-		if ($this->notification_service->is_notification_type_enabled($notification_type_config_name) == false)
+		if (!$this->notification_service->is_notification_type_enabled($notification_type_config_name))
 		{
 			return;
 		}
