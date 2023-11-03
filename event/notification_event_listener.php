@@ -200,7 +200,6 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 		else
 		{
-			$post_data['edit_user_name'] = $this->language->lang('UNKNOWN_USER');
 			$edit_name = $this->notification_service->query_user_name($post_data['edit_user_id']);
 			if ($edit_name != null)
 			{
