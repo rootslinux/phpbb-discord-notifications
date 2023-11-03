@@ -532,7 +532,6 @@ class notification_event_listener implements EventSubscriberInterface
 		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
 
 		// The notification is slightly different depending on whether the user edited their own post, or another user made the edit.
-		$message = '';
 		if ($data['user_id'] == $data['edit_user_id'])
 		{
 			$message = sprintf($this->language->lang('UPDATE_POST_SELF'),
@@ -773,7 +772,6 @@ class notification_event_listener implements EventSubscriberInterface
 		$forum_link = $this->generate_forum_link($data['forum_id'], $data['forum_name']);
 
 		// The notification is slightly different depending on whether the user edited their own topic, or another user made the edit
-		$message = '';
 		if ($data['user_id'] == $data['edit_user_id'])
 		{
 			$message = sprintf($this->language->lang('UPDATE_TOPIC_SELF'),
@@ -940,7 +938,6 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Construct the notification message using the argument data.
-		$message = '';
 		// The message format is slightly different depending on how many users were deleted.
 		if (count($data) == 1)
 		{
@@ -1034,8 +1031,7 @@ class notification_event_listener implements EventSubscriberInterface
 	private function remove_formatting($text)
 	{
 		strip_bbcode($text);
-		$text = html_entity_decode($text, ENT_COMPAT);
-		return $text;
+		return html_entity_decode($text, ENT_COMPAT);
 	}
 
 	/**
