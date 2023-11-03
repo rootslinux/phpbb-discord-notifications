@@ -351,7 +351,7 @@ class notification_event_listener implements EventSubscriberInterface
 		}
 
 		// Get the ID needed to access $event['data'], then extract all relevant data from the event that we need to generate the notification
-		$id = array_pop($event['ids']);
+		$id = array_slice($event['ids'], -1)[0];
 
 		$lock_data = array();
 		$lock_data['forum_id'] = $event['data'][$id]['forum_id'];
