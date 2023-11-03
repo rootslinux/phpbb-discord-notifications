@@ -1008,13 +1008,8 @@ class notification_event_listener implements EventSubscriberInterface
 	 */
 	private function reformat_link_text($text)
 	{
-		// It seems that escaping markdown links is no longer necessary:
+		// Escaping markdown links is no longer necessary:
 		// https://github.com/discord/discord-api-docs/issues/6138
-
-		//$text = strtr($text, [
-		//	'[' => '\\[',
-		//	']' => '\\]'
-		//]);
 		return html_entity_decode($text, ENT_COMPAT);
 	}
 
