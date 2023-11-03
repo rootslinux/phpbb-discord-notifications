@@ -161,7 +161,7 @@ class discord_notifications_module
 	{
 		global $table_prefix;
 
-		$webhook = $this->request->variable('dn_test_webhook', '');
+		$webhook = $this->request->variable('dn_test_webhook', '', true);
 		$test_message = $this->request->variable('dn_test_message', '');
 
 		// Check user inputs before attempting to send the message
@@ -199,7 +199,7 @@ class discord_notifications_module
 			trigger_error('FORM_INVALID', E_USER_WARNING);
 		}
 
-		$delete_alias = $this->request->variable('action_delete_alias',  ['' => '']);
+		$delete_alias = $this->request->variable('action_delete_alias',  ['' => ''], true);
 		foreach ($delete_alias as $alias => $url) {
 			$sql = "DELETE FROM {$table_prefix}discord_webhooks WHERE alias = '" . $this->db->sql_escape($alias) . "'";
 			$this->db->sql_query($sql);
@@ -238,7 +238,7 @@ class discord_notifications_module
 		}
 
 		// Create new entry
-		$new_alias = $this->request->variable('dn_webhook_new_alias', '');
+		$new_alias = $this->request->variable('dn_webhook_new_alias', '', true);
 		$new_url = $this->request->variable('dn_webhook_new_url', '');
 		if ($new_alias !== '' && $new_url !== '')
 		{
@@ -251,7 +251,7 @@ class discord_notifications_module
 		}
 
 		// Update existing entries
-		$webhook_configuration = $this->request->variable('dn_webhook', ['' => '']);
+		$webhook_configuration = $this->request->variable('dn_webhook', ['' => ''], true);
 		// Validate all entries before updating
 		foreach ($webhook_configuration as $url) {
 			if (!$this->validate_url($url))
@@ -266,7 +266,7 @@ class discord_notifications_module
 		}
 
 		// Update configuration per forum
-		$forum_configuration = $this->request->variable('dn_forum', [0 => '']);
+		$forum_configuration = $this->request->variable('dn_forum', [0 => ''], true);
 		foreach ($forum_configuration as $id => $value)
 		{
 			// Don't update deleted entries
@@ -312,7 +312,7 @@ class discord_notifications_module
 		$this->config->set('discord_notification_type_user_create', $this->request->variable('dn_user_create', 0));
 		$this->config->set('discord_notification_type_user_delete', $this->request->variable('dn_user_delete', 0));
 
-		$this->config->set('discord_notification_default_webhook', $this->request->variable('dn_webhook_default', ''));
+		$this->config->set('discord_notification_default_webhook', $this->request->variable('dn_webhook_default', '', true));
 
 		// Log the settings change
 		$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'ACP_DISCORD_NOTIFICATIONS_LOG_UPDATE');
