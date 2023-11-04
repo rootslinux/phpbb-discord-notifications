@@ -1,0 +1,15 @@
+name: Package
+
+on:
+    push:
+        tags:
+            - '*'
+
+jobs:
+    build-test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Phing Build
+              uses: phingofficial/phing-github-action@main
